@@ -1,0 +1,29 @@
+# Secrets - never commit API keys
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node / Next.js / Vercel (for the app later)
+node_modules/
+.next/
+.vercel/
+
+# Crawled data and local caches (rebuilt by running the crawler)
+data/
+
+# Logs
+*.log
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
