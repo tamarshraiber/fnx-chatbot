@@ -1,0 +1,43 @@
+# STEP.md - Build steps for the Phoenix (fnx.co.il) Hebrew RAG chatbot
+
+Status: DONE / NEXT / TODO
+
+## Part A - Terminal bot on ~5 pages
+| # | Step | Status | Notes |
+|---|---|---|---|
+| 1 | Setup | DONE | requirements.txt, .env.example, backend/config.py, scripts/check_gemini.py. Model: gemini-2.5-flash. Committed. |
+| 2 | Scraper | DONE | backend/ingestion/config.py, scraper.py. 5 test pages saved to data/raw/. |
+| 3 | Chunker | DONE (commit pending) | backend/ingestion/chunker.py, chunk settings in config.py. 47 chunks from 5 pages saved to data/chunks/chunks.json. Removes cookie banner, images, link URLs and shared footer. |
+| 4 | Embeddings | NEXT | Gemini Embedding for chunks and questions. |
+| 5 | Supabase table + repository | TODO | supabase/schema.sql, vector_repository.py. |
+| 6 | embed_upload | TODO | Embed and upload. No duplicates on re-run. |
+| 7 | Retrieval | TODO | Initial relevance cutoff, recalibrate later. |
+| 8 | Generation | TODO | Answer only from chunks. Cited URL must be one of the retrieved URLs, otherwise "not on the website". |
+| 9 | Chat service with history | TODO | Terminal bot works end to end. |
+
+## Part B - Backend API
+| # | Step | Status | Notes |
+|---|---|---|---|
+| 10 | FastAPI /chat | TODO | Controller calls chat service. |
+| 11 | Retry with backoff on 429/503 | TODO | backend/utils/retry.py. |
+
+## Part C - Full data
+| # | Step | Status | Notes |
+|---|---|---|---|
+| 12 | Full crawl from the sitemap | TODO | Approved scope: claims, product info, customer service, guides. Exclude login/form subdomains, robots-blocked paths, calculators/quotes, English pages. 1-2 s between requests. |
+| 13 | One-command incremental pipeline | TODO | Only new/changed pages (lastmod + content_hash). Idempotent. |
+
+## Part D - Quality
+| # | Step | Status | Notes |
+|---|---|---|---|
+| 14 | Eval set (~30 questions) | TODO | About 20 answerable + 10 unanswerable. |
+| 15 | Tune retrieval | TODO | Recalibrate cutoff, hybrid search, Cohere Rerank. Keep only what helps. |
+| 16 | Safeguards + backup LLM | TODO | Groq or OpenRouter as backup. |
+| 17 | Tests and logging | TODO | Unit tests per layer, structured logging. |
+| 18 | Refresh job + README | TODO | Scheduled refresh with log of added/updated/removed pages. |
+
+## Last
+Frontend (Hebrew right-to-left chat with history) and hosting.
+
+## Working rules (from CLAUDE.md)
+Explain the plan and list files first. No changes without approval. One task at a time. English only, simple words. After each task: summarize and explain how to test.
