@@ -13,7 +13,7 @@ Status: DONE / NEXT / TODO
 | 6 | embed_upload | DONE | backend/ingestion/embed_upload.py. Embeds chunks.json, deletes old rows per page, upserts by chunk_id. Run: python -m backend.ingestion.embed_upload |
 | 7 | Retrieval | DONE | backend/services/retrieval_service.py, scripts/check_retrieval.py, RELEVANCE_THRESHOLD (0.70, fits 9 test questions) and TOP_K in config.py. Recalibrate with the full site and eval set. |
 | 8 | Generation | DONE | backend/models/schemas.py, backend/services/generation_service.py, scripts/check_generation.py. Answer only from chunks. Cited URL must be one of the retrieved URLs, otherwise "not on the website". |
-| 9 | Chat service with history | TODO | Terminal bot works end to end. |
+| 9 | Chat service with history | DONE | backend/services/chat_service.py, scripts/chat_terminal.py, ChatMessage in schemas.py. Follow-up questions are rewritten into standalone questions (last 6 messages). Run: python -m scripts.chat_terminal |
 
 ## Part B - Backend API
 | # | Step | Status | Notes |

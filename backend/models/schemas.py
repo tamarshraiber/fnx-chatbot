@@ -1,6 +1,12 @@
 from pydantic import BaseModel
 
 
+class ChatMessage(BaseModel):
+    """One message in the conversation history."""
+    role: str  # "user" or "assistant"
+    content: str
+
+
 class LLMAnswer(BaseModel):
     """The shape Gemini must reply in."""
     answerable: bool  # False if the chunks do not contain the answer
