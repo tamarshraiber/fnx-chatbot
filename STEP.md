@@ -7,10 +7,10 @@ Status: DONE / NEXT / TODO
 |---|---|---|---|
 | 1 | Setup | DONE | requirements.txt, .env.example, backend/config.py, scripts/check_gemini.py. Model: gemini-2.5-flash. Committed. |
 | 2 | Scraper | DONE | backend/ingestion/config.py, scraper.py. 5 test pages saved to data/raw/. |
-| 3 | Chunker | DONE (commit pending) | backend/ingestion/chunker.py, chunk settings in config.py. 47 chunks from 5 pages saved to data/chunks/chunks.json. Removes cookie banner, images, link URLs and shared footer. |
-| 4 | Embeddings | NEXT | Gemini Embedding for chunks and questions. |
-| 5 | Supabase table + repository | TODO | supabase/schema.sql, vector_repository.py. |
-| 6 | embed_upload | TODO | Embed and upload. No duplicates on re-run. |
+| 3 | Chunker | DONE | backend/ingestion/chunker.py, chunk settings in config.py. 47 chunks from 5 pages saved to data/chunks/chunks.json. Removes cookie banner, images, link URLs and shared footer. |
+| 4 | Embeddings | DONE | backend/services/embedding_service.py (768 dims), scripts/check_embeddings.py. |
+| 5 | Supabase table + repository | DONE | supabase/schema.sql, vector_repository.py, scripts/check_supabase.py. |
+| 6 | embed_upload | DONE (needs test run) | backend/ingestion/embed_upload.py. Embeds chunks.json, deletes old rows per page, upserts by chunk_id. Run: python -m backend.ingestion.embed_upload |
 | 7 | Retrieval | TODO | Initial relevance cutoff, recalibrate later. |
 | 8 | Generation | TODO | Answer only from chunks. Cited URL must be one of the retrieved URLs, otherwise "not on the website". |
 | 9 | Chat service with history | TODO | Terminal bot works end to end. |
