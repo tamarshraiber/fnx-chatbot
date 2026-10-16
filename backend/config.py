@@ -20,6 +20,10 @@ RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", "0.70"))
 # How many chunks we ask the database for.
 TOP_K = int(os.getenv("TOP_K", "5"))
 
+# Retry (step 11). Total tries per Gemini call, and the first wait (it doubles each time).
+RETRY_MAX_ATTEMPTS = int(os.getenv("RETRY_MAX_ATTEMPTS", "4"))
+RETRY_BASE_DELAY_SECONDS = float(os.getenv("RETRY_BASE_DELAY_SECONDS", "1.0"))
+
 
 def require_gemini_key() -> str:
     """Return the Gemini key, or stop with a clear message if it is missing."""

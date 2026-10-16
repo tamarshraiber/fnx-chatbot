@@ -4,6 +4,7 @@ from backend.config import GEMINI_MODEL
 from backend.models.schemas import ChatAnswer, ChatMessage
 from backend.services.generation_service import _get_client, generate_answer
 from backend.services.retrieval_service import retrieve
+from backend.utils.retry import call_with_retry
 
 # Only the last messages are used, so the prompt stays small.
 MAX_HISTORY_MESSAGES = 6
@@ -24,11 +25,11 @@ def rewrite_question(question: str, history: list[ChatMessage]) -> str:
         return question  # first question, nothing to fix
 
     prompt = f"Conversation:\n{_format_history(history)}\n\nLast question: {question}"
-    response = _get_client().models.generate_content(
+    response = call_with_retry(lambda: _get_client().models.generate_content(
         model=GEMINI_MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(system_instruction=REWRITE_PROMPT, temperature=0.0),
-    )
+    ))
     rewritten = (response.text or "").strip()
     return rewritten or question  # if the rewrite is empty, keep the original
 

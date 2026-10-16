@@ -3,6 +3,7 @@ from google.genai import types
 
 from backend.config import GEMINI_MODEL, require_gemini_key
 from backend.models.schemas import ChatAnswer, LLMAnswer
+from backend.utils.retry import call_with_retry
 
 NOT_ON_WEBSITE = "מידע זה אינו מופיע באתר. מומלץ לפנות לשירות הלקוחות של הפניקס."
 
@@ -43,7 +44,7 @@ def generate_answer(question: str, chunks: list[dict]) -> ChatAnswer:
     if not chunks:
         return _not_on_website()  # nothing relevant, so we do not even call the LLM
 
-    response = _get_client().models.generate_content(
+    response = call_with_retry(lambda: _get_client().models.generate_content(
         model=GEMINI_MODEL,
         contents=_build_prompt(question, chunks),
         config=types.GenerateContentConfig(
@@ -52,7 +53,7 @@ def generate_answer(question: str, chunks: list[dict]) -> ChatAnswer:
             response_schema=LLMAnswer,
             temperature=0.0,
         ),
-    )
+    ))
     result = response.parsed
     if result is None or not result.answerable or not result.answer.strip():
         return _not_on_website()

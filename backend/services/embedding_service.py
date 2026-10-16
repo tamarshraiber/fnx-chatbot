@@ -5,6 +5,7 @@ from google import genai
 from google.genai import types
 
 from backend.config import EMBEDDING_DIMENSIONS, EMBEDDING_MODEL, require_gemini_key
+from backend.utils.retry import call_with_retry
 
 # How many texts we send in one request, and the pause between requests (free-tier limits).
 BATCH_SIZE = 20
@@ -51,5 +52,5 @@ def embed_chunks(texts: list[str]) -> list[list[float]]:
 
 
 def embed_question(question: str) -> list[float]:
-    """Embed one user question (used at question time)."""
-    return _embed([question], "RETRIEVAL_QUERY")[0]
+    """Embed one user question (used at question time). Retries on temporary Gemini errors."""
+    return call_with_retry(lambda: _embed([question], "RETRIEVAL_QUERY"))[0]

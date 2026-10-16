@@ -19,7 +19,7 @@ Status: DONE / NEXT / TODO
 | # | Step | Status | Notes |
 |---|---|---|---|
 | 10 | FastAPI /chat | DONE | backend/main.py, backend/controllers/chat_controller.py, ChatRequest in schemas.py. POST /chat (question + history), GET /health. Run: uvicorn backend.main:app --reload (docs at /docs). CORS comes in the frontend step. |
-| 11 | Retry with backoff on 429/503 | TODO | backend/utils/retry.py. |
+| 11 | Retry with backoff on 429/503 | DONE | backend/utils/retry.py, scripts/check_retry.py, RETRY_* in config.py. Used for the rewrite, answer and question-embedding calls (not embed_chunks). Test: python -m scripts.check_retry |
 
 ## Part C - Full data
 | # | Step | Status | Notes |
