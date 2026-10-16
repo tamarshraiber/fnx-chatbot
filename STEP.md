@@ -18,7 +18,7 @@ Status: DONE / NEXT / TODO
 ## Part B - Backend API
 | # | Step | Status | Notes |
 |---|---|---|---|
-| 10 | FastAPI /chat | TODO | Controller calls chat service. |
+| 10 | FastAPI /chat | DONE | backend/main.py, backend/controllers/chat_controller.py, ChatRequest in schemas.py. POST /chat (question + history), GET /health. Run: uvicorn backend.main:app --reload (docs at /docs). CORS comes in the frontend step. |
 | 11 | Retry with backoff on 429/503 | TODO | backend/utils/retry.py. |
 
 ## Part C - Full data

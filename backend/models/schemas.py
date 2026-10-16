@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ChatMessage(BaseModel):
@@ -19,3 +19,9 @@ class ChatAnswer(BaseModel):
     answer: str
     source_url: str | None  # None when the answer is the fixed "not on the website" reply
     found: bool
+
+
+class ChatRequest(BaseModel):
+    """The JSON body the client sends to POST /chat."""
+    question: str = Field(min_length=1)
+    history: list[ChatMessage] = []
