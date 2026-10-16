@@ -13,6 +13,13 @@ EMBEDDING_MODEL =os.getenv("EMBEDDING_MODEL", "gemini-embedding-001").strip()
 # Must match the vector column size in Supabase (step 5).
 EMBEDDING_DIMENSIONS = int(os.getenv("EMBEDDING_DIMENSIONS", "768"))
 
+# Retrieval (step 7). Chunks with a similarity below the cutoff are treated as not relevant.
+# 0.70 fits the first 9 test questions (answerable >= 0.736, unanswerable <= 0.654).
+# We recalibrate it later with the eval questions and the full site.
+RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", "0.70"))
+# How many chunks we ask the database for.
+TOP_K = int(os.getenv("TOP_K", "5"))
+
 
 def require_gemini_key() -> str:
     """Return the Gemini key, or stop with a clear message if it is missing."""

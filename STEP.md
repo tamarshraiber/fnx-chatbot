@@ -10,8 +10,8 @@ Status: DONE / NEXT / TODO
 | 3 | Chunker | DONE | backend/ingestion/chunker.py, chunk settings in config.py. 47 chunks from 5 pages saved to data/chunks/chunks.json. Removes cookie banner, images, link URLs and shared footer. |
 | 4 | Embeddings | DONE | backend/services/embedding_service.py (768 dims), scripts/check_embeddings.py. |
 | 5 | Supabase table + repository | DONE | supabase/schema.sql, vector_repository.py, scripts/check_supabase.py. |
-| 6 | embed_upload | DONE (needs test run) | backend/ingestion/embed_upload.py. Embeds chunks.json, deletes old rows per page, upserts by chunk_id. Run: python -m backend.ingestion.embed_upload |
-| 7 | Retrieval | TODO | Initial relevance cutoff, recalibrate later. |
+| 6 | embed_upload | DONE | backend/ingestion/embed_upload.py. Embeds chunks.json, deletes old rows per page, upserts by chunk_id. Run: python -m backend.ingestion.embed_upload |
+| 7 | Retrieval | DONE | backend/services/retrieval_service.py, scripts/check_retrieval.py, RELEVANCE_THRESHOLD (0.70, fits 9 test questions) and TOP_K in config.py. Recalibrate with the full site and eval set. |
 | 8 | Generation | TODO | Answer only from chunks. Cited URL must be one of the retrieved URLs, otherwise "not on the website". |
 | 9 | Chat service with history | TODO | Terminal bot works end to end. |
 
