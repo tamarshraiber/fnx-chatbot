@@ -1,9 +1,11 @@
+import argparse
 import asyncio
 import hashlib
 import json
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
@@ -36,6 +38,22 @@ def load_lastmod_map() -> dict[str, str]:
     return result
 
 
+def select_urls(lastmods: dict[str, str], robots: RobotFileParser) -> list[str]:
+    """Keep only the sitemap pages we approved: right host and section, no query, allowed by robots.txt."""
+    selected = []
+    for url in lastmods:
+        parsed = urlparse(url)
+        if parsed.netloc != config.ALLOWED_HOST or parsed.query:
+            continue
+        segments = [part for part in parsed.path.split("/") if part]
+        if not segments or segments[0] not in config.INCLUDE_SECTIONS:
+            continue
+        if not robots.can_fetch(config.USER_AGENT, url):
+            continue
+        selected.append(url)
+    return selected
+
+
 def file_name_for(url: str) -> str:
     """Short, safe file name from the URL (Hebrew URLs make bad file names)."""
     return hashlib.sha256(url.encode("utf-8")).hexdigest()[:16] + ".json"
@@ -51,14 +69,15 @@ def build_run_config() -> CrawlerRunConfig:
     )
 
 
-async def scrape_pages(urls: list[str]) -> tuple[int, int]:
-    """Fetch each URL and save it. Returns (saved_count, failed_count)."""
-    robots = load_robots()
-    lastmods = load_lastmod_map()
+async def scrape_pages(
+    urls: list[str], robots: RobotFileParser, lastmods: dict[str, str], skip_existing: bool = False
+) -> tuple[int, int, int]:
+    """Fetch each URL and save it. Returns (saved_count, failed_count, skipped_count)."""
     config.RAW_DIR.mkdir(parents=True, exist_ok=True)
 
     saved = 0
     failed = 0
+    skipped = 0
     browser_config = BrowserConfig(headless=True, user_agent=config.USER_AGENT)
 
     async with AsyncWebCrawler(config=browser_config) as crawler:
@@ -66,6 +85,11 @@ async def scrape_pages(urls: list[str]) -> tuple[int, int]:
             if not robots.can_fetch(config.USER_AGENT, url):
                 print(f"SKIP (blocked by robots.txt): {url}")
                 failed += 1
+                continue
+
+            # Resume after a crash: do not fetch pages we already saved.
+            if skip_existing and (config.RAW_DIR / file_name_for(url)).exists():
+                skipped += 1
                 continue
 
             try:
@@ -95,12 +119,40 @@ async def scrape_pages(urls: list[str]) -> tuple[int, int]:
 
             await asyncio.sleep(config.DELAY_SECONDS)
 
-    return saved, failed
+    return saved, failed, skipped
 
 
 def main() -> None:
-    saved, failed = asyncio.run(scrape_pages(config.TEST_URLS))
-    print(f"\n{saved} saved, {failed} failed")
+    parser = argparse.ArgumentParser(description="Crawl fnx.co.il pages chosen from the sitemap.")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--limit", type=int, help="crawl only the first N selected pages (quick test)")
+    group.add_argument("--all", action="store_true", help="crawl all selected pages")
+    parser.add_argument("--list", action="store_true", help="only print the selected URLs, do not crawl")
+    parser.add_argument("--test-urls", action="store_true", help="crawl the 5 old test pages")
+    args = parser.parse_args()
+
+    robots = load_robots()
+    lastmods = load_lastmod_map()
+
+    if args.test_urls:
+        urls = config.TEST_URLS
+    else:
+        urls = select_urls(lastmods, robots)
+    print(f"{len(urls)} pages selected from {len(lastmods)} sitemap URLs")
+
+    if args.list:
+        for url in urls:
+            print(url)
+        return
+
+    if args.limit:
+        urls = urls[: args.limit]
+    elif not (args.all or args.test_urls):
+        print("Nothing crawled. Use --limit N for a test or --all for the full crawl.")
+        return
+
+    saved, failed, skipped = asyncio.run(scrape_pages(urls, robots, lastmods, skip_existing=args.all))
+    print(f"\n{saved} saved, {failed} failed, {skipped} skipped (already saved)")
 
 
 if __name__ == "__main__":

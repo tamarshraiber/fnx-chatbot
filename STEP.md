@@ -24,7 +24,7 @@ Status: DONE / NEXT / TODO
 ## Part C - Full data
 | # | Step | Status | Notes |
 |---|---|---|---|
-| 12 | Full crawl from the sitemap | TODO | Approved scope: claims, product info, customer service, guides. Exclude login/form subdomains, robots-blocked paths, calculators/quotes, English pages. 1-2 s between requests. |
+| 12 | Full crawl from the sitemap | DONE | scraper.py picks pages from the sitemap (INCLUDE_SECTIONS in config.py, 1,145 pages). Run: python -m backend.ingestion.scraper --list / --limit N / --all (--all resumes). About 1,133 pages saved; a few failed because the NetFree filter blocks them (retry from another connection). |
 | 13 | One-command incremental pipeline | TODO | Only new/changed pages (lastmod + content_hash). Idempotent. |
 
 ## Part D - Quality

@@ -21,7 +21,37 @@ CHUNK_OVERLAP = 100
 # A piece shorter than this is merged with its neighbour.
 MIN_CHUNK_SIZE = 200
 
-# Step 2 test pages. The full list will come from the sitemap in step 12.
+# Step 12: first path part of the pages we crawl (claims, products, customer service, guides, savings).
+INCLUDE_SECTIONS = {
+    "claims-customer-service",
+    "customer-service",
+    "car-insurance",
+    "health-insurance",
+    "apartment-insurance",
+    "travel-insurance",
+    "mortgage-insurance",
+    "pets-insurance",
+    "life-insurance",
+    "other-insurances",
+    "disability-and-incapacity-to-work",
+    "business-insurance",
+    "truck-insurance",
+    "marine_aviation_insurance",
+    "pension-savings",
+    "gemel",
+    "savings",
+    "ishtalmutfund",
+    "pension_retirement",
+    "loans",
+    "fnx-insurance-ltd",
+    "takanottashlum",
+    "alternativeinvestments",
+}
+
+# Only pages on this host are crawled (login/form subdomains are left out).
+ALLOWED_HOST = "www.fnx.co.il"
+
+# Step 2 test pages (kept for quick tests).
 TEST_URLS = [
     "https://www.fnx.co.il/claims-customer-service/claims-health-insurance/surgery-treatment-covers/",
     "https://www.fnx.co.il/car-insurance/car_information/appraiser/",
