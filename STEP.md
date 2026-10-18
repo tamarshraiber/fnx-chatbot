@@ -31,7 +31,7 @@ Status: DONE / NEXT / TODO
 ## Part D - Quality
 | # | Step | Status | Notes |
 |---|---|---|---|
-| 14 | Eval set (~30 questions) | TODO | About 20 answerable + 10 unanswerable. |
+| 14 | Eval set (~30 questions) | DONE | data/eval/eval_set.json (20 answerable with expected pages, 10 unanswerable: 5 clearly off-topic, 5 "hard" insurance/finance-related), scripts/eval_retrieval.py (retrieval only, no Gemini). Run: python -m scripts.eval_retrieval. Baseline at cutoff 0.84: answerable kept 20/20, expected page in top 5 20/20, unanswerable rejected 5/10 (all 5 hard ones leak, scores 0.857-0.908). Cutoff alone cannot separate them; this is the job of step 15 (rerank / hybrid) and the "not on the website" rule in generation. |
 | 15 | Tune retrieval | TODO | Recalibrate cutoff, hybrid search, Cohere Rerank. Keep only what helps. |
 | 16 | Safeguards + backup LLM | TODO | Groq or OpenRouter as backup. |
 | 17 | Tests and logging | TODO | Unit tests per layer, structured logging. |
