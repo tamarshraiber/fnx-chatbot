@@ -48,6 +48,41 @@ INCLUDE_SECTIONS = {
     "alternativeinvestments",
 }
 
+# Step 13: embedding order. Run.py --tier N embeds only the pages of that tier.
+PRIORITY_TIERS = {
+    1: [
+        "claims-customer-service",
+        "customer-service",
+        "health-insurance",
+        "life-insurance",
+        "disability-and-incapacity-to-work",
+        "other-insurances",
+    ],
+    2: ["car-insurance", "apartment-insurance", "mortgage-insurance", "pets-insurance"],
+    3: ["travel-insurance", "business-insurance", "truck-insurance", "marine_aviation_insurance"],
+    4: [
+        "gemel",
+        "pension-savings",
+        "savings",
+        "ishtalmutfund",
+        "pension_retirement",
+        "loans",
+        "fnx-insurance-ltd",
+        "takanottashlum",
+        "alternativeinvestments",
+    ],
+}
+
+# Step 13: pause after each embedded page, and what to do on a Gemini 429 (too many requests):
+# wait 60 seconds and try the same page again, up to 3 times. After that we assume the daily quota is used.
+PAGE_PAUSE_SECONDS = 2.0
+QUOTA_WAIT_SECONDS = 60
+QUOTA_WAIT_ATTEMPTS = 3
+
+# Step 13: if the sitemap has fewer than this share of the pages we hold, we assume it is broken
+# and delete nothing.
+SAFETY_MIN_RATIO = 0.5
+
 # Only pages on this host are crawled (login/form subdomains are left out).
 ALLOWED_HOST = "www.fnx.co.il"
 

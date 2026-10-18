@@ -69,10 +69,44 @@ def build_run_config() -> CrawlerRunConfig:
     )
 
 
+async def crawl_page(crawler: AsyncWebCrawler, url: str, lastmods: dict[str, str]) -> dict:
+    """Fetch one page and return it as a dict. Raises an error if the page cannot be used."""
+    result = await crawler.arun(url=url, config=build_run_config())
+    if not result.success:
+        raise RuntimeError(result.error_message or "unknown crawl error")
+
+    markdown = str(result.markdown or "").strip()
+    if not markdown:
+        raise RuntimeError("page has no text")
+
+    return {
+        "url": url,
+        "title": (result.metadata or {}).get("title", ""),
+        "markdown": markdown,
+        "lastmod": lastmods.get(url, ""),
+        "content_hash": hashlib.sha256(markdown.encode("utf-8")).hexdigest(),
+        "crawled_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def save_page(page: dict) -> None:
+    """Write one page to data/raw."""
+    config.RAW_DIR.mkdir(parents=True, exist_ok=True)
+    path = config.RAW_DIR / file_name_for(page["url"])
+    path.write_text(json.dumps(page, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 async def scrape_pages(
-    urls: list[str], robots: RobotFileParser, lastmods: dict[str, str], skip_existing: bool = False
+    urls: list[str],
+    robots: RobotFileParser,
+    lastmods: dict[str, str],
+    skip_existing: bool = False,
+    failed_urls: list[str] | None = None,
 ) -> tuple[int, int, int]:
-    """Fetch each URL and save it. Returns (saved_count, failed_count, skipped_count)."""
+    """Fetch each URL and save it. Returns (saved_count, failed_count, skipped_count).
+
+    If failed_urls is given, the URLs that failed are added to it.
+    """
     config.RAW_DIR.mkdir(parents=True, exist_ok=True)
 
     saved = 0
@@ -85,6 +119,8 @@ async def scrape_pages(
             if not robots.can_fetch(config.USER_AGENT, url):
                 print(f"SKIP (blocked by robots.txt): {url}")
                 failed += 1
+                if failed_urls is not None:
+                    failed_urls.append(url)
                 continue
 
             # Resume after a crash: do not fetch pages we already saved.
@@ -93,29 +129,15 @@ async def scrape_pages(
                 continue
 
             try:
-                result = await crawler.arun(url=url, config=build_run_config())
-                if not result.success:
-                    raise RuntimeError(result.error_message or "unknown crawl error")
-
-                markdown = str(result.markdown or "").strip()
-                if not markdown:
-                    raise RuntimeError("page has no text")
-
-                page = {
-                    "url": url,
-                    "title": (result.metadata or {}).get("title", ""),
-                    "markdown": markdown,
-                    "lastmod": lastmods.get(url, ""),
-                    "content_hash": hashlib.sha256(markdown.encode("utf-8")).hexdigest(),
-                    "crawled_at": datetime.now(timezone.utc).isoformat(),
-                }
-                path = config.RAW_DIR / file_name_for(url)
-                path.write_text(json.dumps(page, ensure_ascii=False, indent=2), encoding="utf-8")
-                print(f"OK ({len(markdown)} chars): {url}")
+                page = await crawl_page(crawler, url, lastmods)
+                save_page(page)
+                print(f"OK ({len(page['markdown'])} chars): {url}")
                 saved += 1
             except Exception as error:
                 print(f"FAILED: {url} -> {error}")
                 failed += 1
+                if failed_urls is not None:
+                    failed_urls.append(url)
 
             await asyncio.sleep(config.DELAY_SECONDS)
 

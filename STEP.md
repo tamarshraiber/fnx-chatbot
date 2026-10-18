@@ -25,7 +25,7 @@ Status: DONE / NEXT / TODO
 | # | Step | Status | Notes |
 |---|---|---|---|
 | 12 | Full crawl from the sitemap | DONE | scraper.py picks pages from the sitemap (INCLUDE_SECTIONS in config.py, 1,145 pages). Run: python -m backend.ingestion.scraper --list / --limit N / --all (--all resumes). About 1,133 pages saved; a few failed because the NetFree filter blocks them (retry from another connection). |
-| 13 | One-command incremental pipeline | TODO | Only new/changed pages (lastmod + content_hash). Idempotent. |
+| 13 | One-command incremental pipeline | DONE (not run on real data yet) | backend/ingestion/run.py, state.py, scripts/check_pipeline.py. Run: python -m backend.ingestion.run --dry-run / (no flag) / --full / --max-pages N. Embeds page by page, resumable after a Gemini quota stop. Removed pages are deleted only if the site says 404/410. Offline test: python -m scripts.check_pipeline |
 
 ## Part D - Quality
 | # | Step | Status | Notes |

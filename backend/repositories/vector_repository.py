@@ -40,6 +40,28 @@ def search(query_embedding: list[float], top_k: int = 5) -> list[dict]:
     return response.data
 
 
+def list_page_hashes() -> dict[str, str | None]:
+    """Return {page url: content_hash} for every page stored in the database."""
+    client = _get_client()
+    pages: dict[str, str | None] = {}
+    page_size = 1000  # Supabase returns at most 1000 rows per request
+    start = 0
+    while True:
+        response = (
+            client.table(TABLE)
+            .select("url, content_hash")
+            .eq("chunk_index", 0)
+            .order("url")
+            .range(start, start + page_size - 1)
+            .execute()
+        )
+        for row in response.data:
+            pages[row["url"]] = row["content_hash"]
+        if len(response.data) < page_size:
+            return pages
+        start += page_size
+
+
 def delete_by_url(url: str) -> None:
     """Delete all chunks of one page (used when a page is removed or changed)."""
     _get_client().table(TABLE).delete().eq("url", url).execute()

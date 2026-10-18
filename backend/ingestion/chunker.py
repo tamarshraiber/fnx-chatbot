@@ -109,6 +109,8 @@ def chunk_page(page: dict) -> list[dict]:
     pieces = merge_small_pieces(pieces)
 
     url_id = hashlib.sha256(page["url"].encode("utf-8")).hexdigest()[:16]
+    # Hash of the cleaned text: it changes only when the useful text of the page changes.
+    clean_hash = hashlib.sha256("\n".join(pieces).encode("utf-8")).hexdigest()
     chunks = []
     for index, piece in enumerate(pieces):
         chunks.append(
@@ -118,6 +120,8 @@ def chunk_page(page: dict) -> list[dict]:
                 "url": page["url"],
                 "title": page["title"],
                 "lastmod": page["lastmod"],
+                "content_hash": clean_hash,
+                "crawled_at": page.get("crawled_at"),
                 # The title goes first so the embedding knows the topic of the chunk.
                 "text": f"{page['title']}\n\n{piece}",
             }
