@@ -1,9 +1,5 @@
-from google import genai
-from google.genai import types
-
-from backend.config import GEMINI_MODEL, require_gemini_key
 from backend.models.schemas import ChatAnswer, LLMAnswer
-from backend.utils.retry import call_with_retry
+from backend.services.llm_service import generate_json
 
 NOT_ON_WEBSITE = "מידע זה אינו מופיע באתר. מומלץ לפנות לשירות הלקוחות של הפניקס."
 
@@ -19,17 +15,6 @@ Rules:
 - If the user asks for medical, legal or financial advice, do not give advice. Explain only what the chunks say and suggest a professional or customer service.
 """
 
-_client: genai.Client | None = None
-
-
-def _get_client() -> genai.Client:
-    """Create the Gemini client once and reuse it."""
-    global _client
-    if _client is None:
-        _client = genai.Client(api_key=require_gemini_key())
-    return _client
-
-
 def _build_prompt(question: str, chunks: list[dict]) -> str:
     parts = [f"URL: {chunk['url']}\nTitle: {chunk['title']}\nText:\n{chunk['text']}" for chunk in chunks]
     return "Chunks:\n\n" + "\n\n---\n\n".join(parts) + f"\n\nQuestion: {question}"
@@ -44,18 +29,9 @@ def generate_answer(question: str, chunks: list[dict]) -> ChatAnswer:
     if not chunks:
         return _not_on_website()  # nothing relevant, so we do not even call the LLM
 
-    response = call_with_retry(lambda: _get_client().models.generate_content(
-        model=GEMINI_MODEL,
-        contents=_build_prompt(question, chunks),
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            response_mime_type="application/json",
-            response_schema=LLMAnswer,
-            temperature=0.0,
-        ),
-    ))
-    result = response.parsed
-    if result is None or not result.answerable or not result.answer.strip():
+    # Tries Gemini, then Groq, then OpenRouter (see llm_service.py).
+    result = generate_json(SYSTEM_PROMPT, _build_prompt(question, chunks), LLMAnswer)
+    if not result.answerable or not result.answer.strip():
         return _not_on_website()
 
     # The cited URL must be one we actually retrieved.

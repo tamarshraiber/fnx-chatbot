@@ -1,10 +1,12 @@
 from pydantic import BaseModel, Field
 
+from backend.config import MAX_HISTORY_ITEMS, MAX_MESSAGE_CHARS, MAX_QUESTION_CHARS
+
 
 class ChatMessage(BaseModel):
     """One message in the conversation history."""
     role: str  # "user" or "assistant"
-    content: str
+    content: str = Field(max_length=MAX_MESSAGE_CHARS)
 
 
 class LLMAnswer(BaseModel):
@@ -23,5 +25,5 @@ class ChatAnswer(BaseModel):
 
 class ChatRequest(BaseModel):
     """The JSON body the client sends to POST /chat."""
-    question: str = Field(min_length=1)
-    history: list[ChatMessage] = []
+    question: str = Field(min_length=1, max_length=MAX_QUESTION_CHARS)
+    history: list[ChatMessage] = Field(default=[], max_length=MAX_HISTORY_ITEMS)

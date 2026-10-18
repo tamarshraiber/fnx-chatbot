@@ -38,6 +38,27 @@ RETRY_MAX_ATTEMPTS = int(os.getenv("RETRY_MAX_ATTEMPTS", "4"))
 RETRY_BASE_DELAY_SECONDS = float(os.getenv("RETRY_BASE_DELAY_SECONDS", "1.0"))
 
 
+# Backup LLMs (step 16). Order of use: Gemini first, then Groq, then OpenRouter.
+# A provider with no key is skipped. Both backups speak the OpenAI chat format.
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
+LLM_PROVIDER_ORDER = [name.strip() for name in os.getenv("LLM_PROVIDER_ORDER", "gemini,groq,openrouter").split(",") if name.strip()]
+# After a provider fails (quota, overload, network), skip it for this many seconds, then try it again.
+LLM_COOLDOWN_SECONDS = float(os.getenv("LLM_COOLDOWN_SECONDS", "60"))
+LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "30"))
+
+
+# Safeguards (step 16b). Limits on what POST /chat accepts.
+MAX_QUESTION_CHARS = int(os.getenv("MAX_QUESTION_CHARS", "500"))
+MAX_HISTORY_ITEMS = int(os.getenv("MAX_HISTORY_ITEMS", "20"))
+MAX_MESSAGE_CHARS = int(os.getenv("MAX_MESSAGE_CHARS", "2000"))
+# Each client IP may send this many requests per window.
+RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "20"))
+RATE_LIMIT_WINDOW_SECONDS = float(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+
+
 def require_gemini_key() -> str:
     """Return the Gemini key, or stop with a clear message if it is missing."""
     if not GEMINI_API_KEY:
