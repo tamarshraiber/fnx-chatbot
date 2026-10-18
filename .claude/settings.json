@@ -4,7 +4,10 @@
       "Bash(git check-ignore *)",
       "Bash(git add *)",
       "Bash(git commit -m 'step 13_1: one-command incremental pipeline with priority tiers, resumable page-by-page embedding and quota wait *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(.venv/Scripts/python.exe -m pip install sentence-transformers)",
+      "Bash(PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m scripts.check_embeddings)",
+      "Bash(curl -sI -m 15 https://huggingface.co/intfloat/multilingual-e5-base/resolve/main/config.json)"
     ]
   }
 }

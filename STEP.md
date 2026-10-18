@@ -32,7 +32,7 @@ Status: DONE / NEXT / TODO
 | # | Step | Status | Notes |
 |---|---|---|---|
 | 14 | Eval set (~30 questions) | DONE | data/eval/eval_set.json (20 answerable with expected pages, 10 unanswerable: 5 clearly off-topic, 5 "hard" insurance/finance-related), scripts/eval_retrieval.py (retrieval only, no Gemini). Run: python -m scripts.eval_retrieval. Baseline at cutoff 0.84: answerable kept 20/20, expected page in top 5 20/20, unanswerable rejected 5/10 (all 5 hard ones leak, scores 0.857-0.908). Cutoff alone cannot separate them; this is the job of step 15 (rerank / hybrid) and the "not on the website" rule in generation. |
-| 15 | Tune retrieval | TODO | Recalibrate cutoff, hybrid search, Cohere Rerank. Keep only what helps. |
+| 15 | Tune retrieval | IN PROGRESS | 15a+15b done: backend/services/rerank_service.py (Cohere rerank-v3.5), switchable in retrieval_service.py (RERANK_ENABLED, default false; falls back to vector search if Cohere fails), RERANK_* in config.py, scripts/eval_retrieval.py compares vector vs rerank (--cached / --no-rerank). Eval result: vector best 25/30 at 0.84; rerank best 27/30 at cutoff 0.70-0.75 (rejects 4 of the 5 hard questions, but drops 2 answerable ones). Small gain, small eval set. Not enabled yet; 15c hybrid search not started. |
 | 16 | Safeguards + backup LLM | TODO | Groq or OpenRouter as backup. |
 | 17 | Tests and logging | TODO | Unit tests per layer, structured logging. |
 | 18 | Refresh job + README | TODO | Scheduled refresh with log of added/updated/removed pages. |

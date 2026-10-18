@@ -5,3 +5,4 @@ sentence-transformers==6.1.0
 supabase==2.33.0
 fastapi==0.143.2
 uvicorn==0.54.0
+cohere==7.2.0

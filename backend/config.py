@@ -23,6 +23,16 @@ RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", "0.84"))
 # How many chunks we ask the database for.
 TOP_K = int(os.getenv("TOP_K", "5"))
 
+# Rerank (step 15). Cohere re-scores the chunks that vector search found, by reading question and chunk together.
+# Off by default until the eval set shows it helps. Turn on with RERANK_ENABLED=true.
+COHERE_API_KEY = os.getenv("COHERE_API_KEY", "").strip()
+RERANK_ENABLED = os.getenv("RERANK_ENABLED", "false").strip().lower() == "true"
+RERANK_MODEL = os.getenv("RERANK_MODEL", "rerank-v3.5").strip()
+# How many chunks vector search hands to the reranker (we keep TOP_K of them after reranking).
+RERANK_FETCH_K = int(os.getenv("RERANK_FETCH_K", "20"))
+# Chunks with a rerank score below this are dropped. Placeholder: we set it from the eval set.
+RERANK_THRESHOLD = float(os.getenv("RERANK_THRESHOLD", "0.5"))
+
 # Retry (step 11). Total tries per Gemini call, and the first wait (it doubles each time).
 RETRY_MAX_ATTEMPTS = int(os.getenv("RETRY_MAX_ATTEMPTS", "4"))
 RETRY_BASE_DELAY_SECONDS = float(os.getenv("RETRY_BASE_DELAY_SECONDS", "1.0"))
