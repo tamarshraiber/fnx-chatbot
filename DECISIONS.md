@@ -14,7 +14,7 @@ Explain plan first, list files, no changes without approval, one task at a time,
 | Languages | Python (data pipeline and backend); frontend decided later | One language for crawl, RAG and API; best libraries |
 | Crawler | Crawl4AI, run locally | Free, no page limit, handles JS, polite-rate control |
 | Answer LLM | Gemini Flash (free tier) | Good Hebrew, free; user has Google account |
-| Embeddings | Gemini Embedding | Same key, good Hebrew, free tier |
+| Embeddings | Local multilingual-e5-base (768 dims), inside the backend. Gemini only rewrites questions and writes answers | Gemini free embedding quota (about 170 pages per day) made loading 9,000 chunks take a week. No quota, no key, no cost. Pages and questions must use the same model |
 | Vector DB | Supabase pgvector | Free cloud DB; vector + keyword search together |
 | Backend | Python (FastAPI), layered: controllers, services, repositories, models, ingestion. Hosting decided after it works locally | Clean separation; one language. Replaces the earlier Next.js on Vercel decision |
 | UI | Hebrew right-to-left chat with history; framework and host decided later | Requirement |

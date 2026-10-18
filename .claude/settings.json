@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git check-ignore *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'step 13_1: one-command incremental pipeline with priority tiers, resumable page-by-page embedding and quota wait *)",
+      "Bash(git push *)"
+    ]
+  }
+}

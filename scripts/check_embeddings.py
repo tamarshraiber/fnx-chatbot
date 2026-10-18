@@ -33,6 +33,12 @@ def main() -> None:
     for score, chunk in scored:
         print(f"{score:.3f}  {chunk['title']}")
 
+    # Hebrew sanity check: a related text must score higher than an unrelated one.
+    related, unrelated = embed_chunks(["שמאי רכב בודק את הנזק לרכב לאחר תאונה ומעריך את עלות התיקון.", "מתכון לעוגת שוקולד עם קצפת."])
+    related_score, unrelated_score = similarity(question_vector, related), similarity(question_vector, unrelated)
+    print(f"\nRelated: {related_score:.3f} | Unrelated: {unrelated_score:.3f}")
+    print("OK: Hebrew works" if related_score > unrelated_score + 0.05 else "FAIL: related text is not clearly closer")
+
 
 if __name__ == "__main__":
     main()

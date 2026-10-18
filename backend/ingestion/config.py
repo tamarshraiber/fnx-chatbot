@@ -75,7 +75,7 @@ PRIORITY_TIERS = {
 
 # Step 13: pause after each embedded page, and what to do on a Gemini 429 (too many requests):
 # wait 60 seconds and try the same page again, up to 3 times. After that we assume the daily quota is used.
-PAGE_PAUSE_SECONDS = 2.0
+PAGE_PAUSE_SECONDS = 0  # embeddings are local now, so no pause is needed
 QUOTA_WAIT_SECONDS = 60
 QUOTA_WAIT_ATTEMPTS = 3
 

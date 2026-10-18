@@ -1,56 +1,54 @@
-import math
-import time
+import os
 
-from google import genai
-from google.genai import types
+# The default Hugging Face download protocol ("xet") is blocked by some filters (NetFree) and fails
+# on the big model file. The normal protocol works. This must be set before the import below.
+os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 
-from backend.config import EMBEDDING_DIMENSIONS, EMBEDDING_MODEL, require_gemini_key
-from backend.utils.retry import call_with_retry
+from sentence_transformers import SentenceTransformer  # noqa: E402
 
-# How many texts we send in one request, and the pause between requests (free-tier limits).
-BATCH_SIZE = 20
-PAUSE_SECONDS = 1.0
+from backend.config import EMBEDDING_DIMENSIONS, EMBEDDING_MODEL
 
+# How many texts the model processes at once (a bigger batch uses more memory).
+BATCH_SIZE = 16
 
-_client: genai.Client | None = None
+# E5 models were trained with these prefixes: "passage: " for documents, "query: " for questions.
+# Without them the search quality drops.
+DOCUMENT_PREFIX = "passage: "
+QUERY_PREFIX = "query: "
 
-
-def _get_client() -> genai.Client:
-    """Create the Gemini client once and reuse it."""
-    global _client
-    if _client is None:
-        _client = genai.Client(api_key=require_gemini_key())
-    return _client
+_model: SentenceTransformer | None = None
 
 
-def _normalize(vector: list[float]) -> list[float]:
-    """Scale the vector to length 1. Gemini asks for this when the size is below 3072."""
-    length = math.sqrt(sum(value * value for value in vector))
-    return [value / length for value in vector] if length else vector
+def _get_model() -> SentenceTransformer:
+    """Load the model once and reuse it (the first load downloads it and takes a while)."""
+    global _model
+    if _model is None:
+        _model = SentenceTransformer(EMBEDDING_MODEL)
+        size = _model.get_embedding_dimension()
+        if size != EMBEDDING_DIMENSIONS:
+            raise RuntimeError(
+                f"Model {EMBEDDING_MODEL} makes vectors of size {size}, but the database expects {EMBEDDING_DIMENSIONS}."
+            )
+    return _model
 
 
-def _embed(texts: list[str], task_type: str) -> list[list[float]]:
-    response = _get_client().models.embed_content(
-        model=EMBEDDING_MODEL,
-        contents=texts,
-        config=types.EmbedContentConfig(
-            task_type=task_type,
-            output_dimensionality=EMBEDDING_DIMENSIONS,
-        ),
+def _embed(texts: list[str], prefix: str) -> list[list[float]]:
+    # normalize_embeddings=True scales each vector to length 1, so the dot product is the cosine similarity.
+    vectors = _get_model().encode(
+        [prefix + text for text in texts],
+        batch_size=BATCH_SIZE,
+        normalize_embeddings=True,
+        show_progress_bar=False,
     )
-    return [_normalize(list(item.values)) for item in response.embeddings]
+    return vectors.tolist()
 
 
 def embed_chunks(texts: list[str]) -> list[list[float]]:
     """Embed many chunk texts (used when we build the database)."""
-    vectors: list[list[float]] = []
-    for start in range(0, len(texts), BATCH_SIZE):
-        if start:
-            time.sleep(PAUSE_SECONDS)
-        vectors.extend(_embed(texts[start:start + BATCH_SIZE], "RETRIEVAL_DOCUMENT"))
-    return vectors
+    return _embed(texts, DOCUMENT_PREFIX)
 
 
 def embed_question(question: str) -> list[float]:
-    """Embed one user question (used at question time). Retries on temporary Gemini errors."""
-    return call_with_retry(lambda: _embed([question], "RETRIEVAL_QUERY"))[0]
+    """Embed one user question (used at question time)."""
+    return _embed([question], QUERY_PREFIX)[0]

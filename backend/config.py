@@ -9,14 +9,17 @@ GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-latest").strip()
 SUPABASE_URL = os.getenv("SUPABASE_URL", "").strip()
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "").strip()
 
-EMBEDDING_MODEL =os.getenv("EMBEDDING_MODEL", "gemini-embedding-001").strip()
+# Local model (runs on our own machine, no API key, no quota). Gemini is used only for the answers.
+# Documents and questions MUST be embedded by the same model.
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-base").strip()
 # Must match the vector column size in Supabase (step 5).
 EMBEDDING_DIMENSIONS = int(os.getenv("EMBEDDING_DIMENSIONS", "768"))
 
 # Retrieval (step 7). Chunks with a similarity below the cutoff are treated as not relevant.
-# 0.70 fits the first 9 test questions (answerable >= 0.736, unanswerable <= 0.654).
-# We recalibrate it later with the eval questions and the full site.
-RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", "0.70"))
+# 0.84 fits the local E5 model on the full site (answerable questions >= 0.86, off-topic questions <= 0.81).
+# E5 scores sit in a high, narrow range, so this is much higher than the old Gemini cutoff (0.70).
+# We recalibrate it again with the eval questions (step 14/15).
+RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", "0.84"))
 # How many chunks we ask the database for.
 TOP_K = int(os.getenv("TOP_K", "5"))
 
