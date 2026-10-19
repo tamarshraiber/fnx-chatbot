@@ -1,0 +1,59 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg);
+}
+.chat__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-5);
+}
+.chat__footer { padding: var(--space-3) var(--space-5) var(--space-4); }
+
+/* Full page: fills the screen, with a soft warm glow behind the content */
+.chat--full {
+  height: 100dvh;
+  background:
+    radial-gradient(900px 420px at 85% -10%, var(--bg-glow), transparent),
+    radial-gradient(700px 400px at 5% 0%, rgba(27, 58, 120, 0.08), transparent),
+    var(--bg);
+}
+
+/* Widget: a floating window in the bottom corner */
+.chat--widget {
+  position: fixed;
+  inset-block-end: 96px;
+  inset-inline-end: 24px;
+  z-index: 20;
+  width: 400px;
+  height: min(640px, calc(100dvh - 120px));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: widget-in 0.25s ease-out both;
+}
+.chat--widget .chat__body { padding: var(--space-3) var(--space-4); }
+.chat--widget .chat__footer { padding: var(--space-2) var(--space-3) var(--space-3); }
+.chat--widget .bubble { max-width: 90%; }
+.chat--widget .input__note { display: none; }
+@keyframes widget-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 640px) {
+  .chat__body { padding: var(--space-3); }
+  .chat__footer { padding: var(--space-2) var(--space-3) var(--space-3); }
+  .chat--widget {
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+}

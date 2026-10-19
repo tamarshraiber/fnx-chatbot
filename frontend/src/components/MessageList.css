@@ -1,0 +1,9 @@
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: var(--space-4) 0;
+}

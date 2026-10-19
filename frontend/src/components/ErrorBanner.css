@@ -1,0 +1,32 @@
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto var(--space-3);
+  padding: 10px 14px;
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-sm);
+  background: var(--error-bg);
+  color: var(--error-text);
+  font-size: 15px;
+  animation: msg-in 0.25s ease-out both;
+}
+.error__retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.error__retry:hover { background: rgba(255, 255, 255, 0.25); }
+.error__retry svg { width: 16px; height: 16px; }

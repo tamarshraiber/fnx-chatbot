@@ -1,0 +1,13 @@
+.rich p { margin: 0 0 0.8em; }
+.rich > :last-child { margin-bottom: 0; }
+.rich ul, .rich ol { margin: 0 0 0.8em; padding-inline-start: 1.4em; }
+.rich li { margin-bottom: 0.35em; }
+.rich li::marker { color: var(--accent); }
+.rich strong { font-weight: 600; }
+.rich a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  unicode-bidi: isolate; /* a URL inside Hebrew text keeps its own direction */
+}
+.rich a:hover { color: var(--accent); }

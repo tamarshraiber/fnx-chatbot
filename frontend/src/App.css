@@ -1,0 +1,45 @@
+.stage {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+  background:
+    radial-gradient(800px 400px at 80% 0%, var(--bg-glow), transparent),
+    var(--bg);
+}
+.stage__intro { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); text-align: center; }
+.stage__intro h1 { margin: 0; font-size: 28px; color: var(--brand); }
+.stage__intro p { margin: 0; color: var(--text-muted); }
+.stage__full {
+  min-height: 44px;
+  padding: 8px 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-weight: 500;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.stage__full:hover { border-color: var(--accent); box-shadow: var(--shadow-md); }
+
+.launcher {
+  position: fixed;
+  inset-block-end: 24px;
+  inset-inline-end: 24px;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  width: 60px; height: 60px;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy-800), var(--navy-700));
+  color: #fff;
+  box-shadow: var(--shadow-lg), 0 0 0 3px rgba(242, 106, 33, 0.35);
+  transition: transform 0.18s;
+}
+.launcher:hover { transform: scale(1.07); }
+.launcher svg { width: 26px; height: 26px; }
+
+@media (max-width: 640px) {
+  /* a full-screen open widget would cover the launcher, so the window's own close button is used */
+  .launcher[aria-expanded="true"] { display: none; }
+}

@@ -1,0 +1,66 @@
+/* Design tokens: every color, radius, shadow and spacing step lives here. */
+:root {
+  --navy-950: #070f24;
+  --navy-900: #0b1b3b;
+  --navy-800: #12285a;
+  --navy-700: #1b3a78;
+  --orange-500: #f26a21;
+  --orange-400: #ff8a4c;
+  --orange-100: #fff0e6;
+
+  --bg: #f4f6fb;
+  --bg-glow: rgba(242, 106, 33, 0.09);
+  --surface: #ffffff;
+  --surface-2: #eef2f9;
+  --text: #0e1a33;
+  --text-muted: #5a6784;
+  --border: #dde4f0;
+  --accent: var(--orange-500);
+  --brand: var(--navy-800);
+  --user-bg: linear-gradient(135deg, var(--navy-800), var(--navy-700));
+  --user-text: #ffffff;
+  --warn-bg: #fff6ec;
+  --warn-border: #f7d3b3;
+  --error-bg: #fdeeee;
+  --error-border: #f1b9b9;
+  --error-text: #8d1f1f;
+  --focus: #1d6fe0;
+
+  --shadow-sm: 0 1px 2px rgba(11, 27, 59, 0.06), 0 1px 3px rgba(11, 27, 59, 0.08);
+  --shadow-md: 0 6px 20px rgba(11, 27, 59, 0.1);
+  --shadow-lg: 0 24px 60px rgba(11, 27, 59, 0.22);
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --font: "Heebo", "Assistant", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #070f24;
+    --bg-glow: rgba(242, 106, 33, 0.1);
+    --surface: #101c38;
+    --surface-2: #17264a;
+    --text: #e8edf8;
+    --text-muted: #9aa8c6;
+    --border: #25365e;
+    --brand: #9db8f2;
+    --user-bg: linear-gradient(135deg, #1b3a78, #254a94);
+    --warn-bg: #2a1d14;
+    --warn-border: #5a3a22;
+    --error-bg: #2d1518;
+    --error-border: #6b2a30;
+    --error-text: #ffb4b4;
+    --focus: #6aa5ff;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+  }
+}

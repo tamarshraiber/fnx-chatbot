@@ -1,0 +1,23 @@
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+/* thin orange line under the header: the one warm accent of the frame */
+.header::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--orange-500) 50%, transparent);
+  opacity: 0.55;
+}
+.header__titles { flex: 1; line-height: 1.2; }
+.header__name { font-weight: 700; font-size: 18px; color: var(--brand); }
+.header__sub { font-size: 13px; color: var(--text-muted); }
+.header__actions { display: flex; gap: var(--space-1); }
