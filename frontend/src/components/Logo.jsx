@@ -1,19 +1,38 @@
+import { useId } from "react";
 import "./Logo.css";
 
-/** Abstract phoenix mark: a rising flame over a pair of wing strokes. Drawn for this project. */
+/** Profile icon: a soft navy circle with a fire-colored Hebrew letter ה (He). */
 export default function Logo({ size = 40 }) {
+  const id = useId(); // gradient ids must be unique, since the logo appears several times on one page
+  const navy = `${id}-navy`;
+  const fire = `${id}-fire`;
   return (
-    <svg className="logo" width={size} height={size} viewBox="0 0 48 48" role="img" aria-label="הפניקס">
+    <svg className="logo" width={size} height={size} viewBox="0 0 64 64" role="img" aria-label="הפניקס">
       <defs>
-        <linearGradient id="phx-flame" x1="12" y1="44" x2="36" y2="4" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#12285a" />
-          <stop offset="0.6" stopColor="#1b3a78" />
-          <stop offset="1" stopColor="#f26a21" />
+        <linearGradient id={navy} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stopColor="#0b1b3b" />
+          <stop offset="1" stopColor="#1f4a9c" />
+        </linearGradient>
+        <linearGradient id={fire} gradientUnits="userSpaceOnUse" x1="0" y1="44" x2="0" y2="20">
+          <stop offset="0" stopColor="#f58a4b" />
+          <stop offset="1" stopColor="#ffc89a" />
         </linearGradient>
       </defs>
-      <path d="M24 3c1 8 9 12 9 22a9 9 0 0 1-18 0c0-5 3-8 5-10 0 4 1 6 3 7-1-7 0-14 1-19Z" fill="url(#phx-flame)" />
-      <path d="M8 30c4 8 12 13 16 13s12-5 16-13c-4 4-9 6-16 6S12 34 8 30Z" fill="url(#phx-flame)" opacity="0.55" />
-      <circle cx="24" cy="26" r="3" fill="#fff" opacity="0.9" />
+      {/* round background with a faint ring */}
+      <circle cx="32" cy="32" r="31" fill={`url(#${navy})`} />
+      <circle cx="32" cy="32" r="30" fill="none" stroke="#f58a4b" strokeOpacity="0.35" strokeWidth="1" />
+      {/* the letter He, sitting on the baseline. On screen it looked too low at y=44, so it is moved up */}
+      <text
+        x="32"
+        y="41"
+        textAnchor="middle"
+        fontFamily="'Arial Hebrew', Arial, 'Segoe UI', sans-serif"
+        fontSize="34"
+        fontWeight="700"
+        fill={`url(#${fire})`}
+      >
+        ה
+      </text>
     </svg>
   );
 }

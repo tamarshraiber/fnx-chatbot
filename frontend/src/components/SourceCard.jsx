@@ -17,12 +17,17 @@ function describe(url) {
   }
 }
 
-export default function SourceCard({ url }) {
+/** The link text is the page title. Without a title, we fall back to the readable address. */
+export default function SourceCard({ url, title }) {
   const { host, path } = describe(url);
   return (
     <a className="source" href={url} target="_blank" rel="noopener noreferrer">
       <span className="source__label">מקור באתר</span>
-      <span className="source__url" dir="ltr">{host}{path}</span>
+      {title ? (
+        <span className="source__url source__url--title" dir="auto">{title}</span>
+      ) : (
+        <span className="source__url" dir="ltr">{host}{path}</span>
+      )}
       <span className="source__arrow"><ExternalIcon /></span>
     </a>
   );

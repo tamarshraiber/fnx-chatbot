@@ -34,5 +34,6 @@
 }
 .suggest__card:active:not(:disabled) { transform: scale(0.98); }
 .suggest__card:disabled { opacity: 0.6; cursor: default; }
-.suggest__topic { font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: 0.02em; }
+.suggest__topic { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: 0.02em; }
+.suggest__topic svg { width: 16px; height: 16px; flex: none; }
 .suggest__text { font-weight: 500; line-height: 1.4; }

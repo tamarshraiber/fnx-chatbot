@@ -21,6 +21,7 @@ class ChatAnswer(BaseModel):
     answer: str
     source_url: str | None  # None when the answer is the fixed "not on the website" reply
     found: bool
+    source_title: str | None = None  # page title of the source, shown as the link text
 
 
 class ChatRequest(BaseModel):

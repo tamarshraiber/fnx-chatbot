@@ -27,5 +27,6 @@
   white-space: nowrap;
   min-width: 0;
 }
+.source__url--title { font-size: 14px; font-weight: 600; }
 .source__arrow { grid-area: arrow; color: var(--accent); display: grid; }
 .source__arrow svg { width: 18px; height: 18px; }

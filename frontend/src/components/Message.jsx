@@ -40,7 +40,7 @@ export default function Message({ message }) {
       <Logo size={32} />
       <div className={`answer ${message.found ? "" : "answer--notfound"}`}>
         <RichText text={message.content} />
-        {message.found && message.sourceUrl && <SourceCard url={message.sourceUrl} />}
+        {message.found && message.sourceUrl && <SourceCard url={message.sourceUrl} title={message.sourceTitle} />}
         {!message.found && (
           <p className="answer__hint">אפשר לנסח את השאלה אחרת, או לשאול על נושא אחר באתר הפניקס.</p>
         )}

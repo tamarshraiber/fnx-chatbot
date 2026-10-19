@@ -1,3 +1,5 @@
+import re
+
 from backend.models.schemas import ChatAnswer, LLMAnswer
 from backend.services.llm_service import generate_json
 
@@ -20,6 +22,16 @@ def _build_prompt(question: str, chunks: list[dict]) -> str:
     return "Chunks:\n\n" + "\n\n---\n\n".join(parts) + f"\n\nQuestion: {question}"
 
 
+# A site suffix at the end of a page title, such as " | הפניקס" or " - Phoenix".
+_SITE_SUFFIX = re.compile(r"\s*[|\-–—:]\s*[^|\-–—:]*(הפניקס|phoenix|fnx)[^|\-–—:]*$", re.IGNORECASE)
+
+
+def _clean_title(title: str) -> str | None:
+    """Remove the site name from the end of a page title. Returns None if nothing is left."""
+    cleaned = _SITE_SUFFIX.sub("", title or "").strip()
+    return cleaned or None
+
+
 def _not_on_website() -> ChatAnswer:
     return ChatAnswer(answer=NOT_ON_WEBSITE, source_url=None, found=False)
 
@@ -35,8 +47,13 @@ def generate_answer(question: str, chunks: list[dict]) -> ChatAnswer:
         return _not_on_website()
 
     # The cited URL must be one we actually retrieved.
-    retrieved_urls = {chunk["url"] for chunk in chunks}
-    if result.source_url not in retrieved_urls:
+    titles_by_url = {chunk["url"]: chunk.get("title", "") for chunk in chunks}
+    if result.source_url not in titles_by_url:
         return _not_on_website()
 
-    return ChatAnswer(answer=result.answer.strip(), source_url=result.source_url, found=True)
+    return ChatAnswer(
+        answer=result.answer.strip(),
+        source_url=result.source_url,
+        found=True,
+        source_title=_clean_title(titles_by_url[result.source_url]),
+    )

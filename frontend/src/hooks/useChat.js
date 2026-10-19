@@ -32,6 +32,7 @@ export function useChat() {
           role: "assistant",
           content: result.answer,
           sourceUrl: result.source_url,
+          sourceTitle: result.source_title,
           found: result.found,
         },
       ]);

@@ -12,7 +12,7 @@ export class ChatError extends Error {
   }
 }
 
-/** Send one question plus the earlier messages. Returns { answer, source_url, found }. */
+/** Send one question plus the earlier messages. Returns { answer, source_url, source_title, found }. */
 export async function sendChat(question, history) {
   const body = {
     question,
