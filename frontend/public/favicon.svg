@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="navy" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#0b1b3b" />
+      <stop offset="1" stop-color="#1f4a9c" />
+    </linearGradient>
+    <linearGradient id="fire" gradientUnits="userSpaceOnUse" x1="0" y1="44" x2="0" y2="20">
+      <stop offset="0" stop-color="#f58a4b" />
+      <stop offset="1" stop-color="#ffc89a" />
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#navy)" />
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#f58a4b" stroke-opacity="0.35" stroke-width="1" />
+  <text x="32" y="41" text-anchor="middle" font-family="'Arial Hebrew', Arial, 'Segoe UI', sans-serif" font-size="34" font-weight="700" fill="url(#fire)">ה</text>
+</svg>

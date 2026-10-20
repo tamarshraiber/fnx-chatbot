@@ -1,20 +1,43 @@
 import { useCallback, useRef, useState } from "react";
 import { ChatError, sendChat } from "../api";
 
-let nextId = 1;
+const STORAGE_KEY = "phoenix-chat-messages";
 
-/** Holds the conversation: messages, loading flag and the last error. History lives only in memory. */
+/** Read the saved conversation. sessionStorage survives a page refresh but is erased when the tab is closed. */
+function loadSaved() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY));
+    return Array.isArray(saved) ? saved : [];
+  } catch {
+    return []; // storage blocked or data broken: start empty
+  }
+}
+
+function save(messages) {
+  try {
+    if (messages.length) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    else sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // storage blocked or full: the chat still works, it just will not survive a refresh
+  }
+}
+
+const initialMessages = loadSaved();
+let nextId = initialMessages.reduce((max, m) => Math.max(max, Number(m.id) || 0), 0) + 1; // continue after the saved ids
+
+/** Holds the conversation: messages, loading flag and the last error. Messages are also kept in sessionStorage. */
 export function useChat() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(initialMessages);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null); // { message, canRetry }
   const lastRequest = useRef(null);
-  const messagesRef = useRef([]);
+  const messagesRef = useRef(initialMessages);
   const session = useRef(0); // bumped on reset, so a late reply from the old conversation is dropped
 
   const update = (next) => {
     messagesRef.current = next;
     setMessages(next);
+    save(next);
   };
 
   const run = useCallback(async (question, history) => {

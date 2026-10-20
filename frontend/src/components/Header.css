@@ -17,7 +17,23 @@
   background: linear-gradient(90deg, transparent, var(--orange-500) 50%, transparent);
   opacity: 0.55;
 }
-.header__titles { flex: 1; line-height: 1.2; }
+/* logo and title together are one button: back to the start screen */
+.header__home {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.header__home:hover { opacity: 0.8; }
+.header__titles { display: flex; flex-direction: column; line-height: 1.2; }
 .header__name { font-weight: 700; font-size: 18px; color: var(--brand); }
 .header__sub { font-size: 13px; color: var(--text-muted); }
 .header__actions { display: flex; gap: var(--space-1); }

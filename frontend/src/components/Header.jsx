@@ -6,11 +6,13 @@ export default function Header({ mode, hasMessages, onNewChat, onToggleMode, onC
   const widget = mode === "widget";
   return (
     <header className="header">
-      <Logo size={widget ? 32 : 40} />
-      <div className="header__titles">
-        <div className="header__name">הפניקס</div>
-        <div className="header__sub">עוזר וירטואלי</div>
-      </div>
+      <button type="button" className="header__home" onClick={onNewChat} title="חזרה למסך הראשי" aria-label="חזרה למסך הראשי">
+        <Logo size={widget ? 32 : 40} />
+        <span className="header__titles">
+          <span className="header__name">הפניקס</span>
+          <span className="header__sub">עוזר וירטואלי</span>
+        </span>
+      </button>
       <div className="header__actions">
         {hasMessages && (
           <button type="button" className="icon-btn" onClick={onNewChat} title="שיחה חדשה" aria-label="שיחה חדשה">

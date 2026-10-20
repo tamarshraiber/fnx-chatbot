@@ -33,9 +33,11 @@ RERANK_FETCH_K = int(os.getenv("RERANK_FETCH_K", "20"))
 # Chunks with a rerank score below this are dropped. Placeholder: we set it from the eval set.
 RERANK_THRESHOLD = float(os.getenv("RERANK_THRESHOLD", "0.5"))
 
-# Retry (step 11). Total tries per Gemini call, and the first wait (it doubles each time).
-RETRY_MAX_ATTEMPTS = int(os.getenv("RETRY_MAX_ATTEMPTS", "4"))
-RETRY_BASE_DELAY_SECONDS = float(os.getenv("RETRY_BASE_DELAY_SECONDS", "1.0"))
+# Retry (step 11). Total tries per LLM call, and the first wait (it doubles each time).
+# Kept short on purpose: we have backup providers, so after one quick retry it is faster to switch than to wait
+# (it was 4 tries with 1s, 2s, 4s waits, which could add about 7 seconds to an answer).
+RETRY_MAX_ATTEMPTS = int(os.getenv("RETRY_MAX_ATTEMPTS", "2"))
+RETRY_BASE_DELAY_SECONDS = float(os.getenv("RETRY_BASE_DELAY_SECONDS", "0.5"))
 
 
 # Backup LLMs (step 16). Order of use: Gemini first, then Groq, then OpenRouter.

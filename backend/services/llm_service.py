@@ -104,9 +104,11 @@ def _generate(system_prompt: str, prompt: str, schema: type[M] | None) -> str | 
     errors_seen: list[str] = []
     for name in _candidates():
         function = _PROVIDERS[name][0]
+        started = time.perf_counter()
         try:
             text = function(system_prompt, prompt, schema)
             result = text.strip() if schema is None else schema.model_validate_json(text)
+            print(f"LLM {name} answered in {time.perf_counter() - started:.2f}s")
         except ValidationError as error:
             # The provider answered but not in the right shape. Try the next one, no cooldown.
             errors_seen.append(f"{name}: bad JSON ({error.error_count()} errors)")
