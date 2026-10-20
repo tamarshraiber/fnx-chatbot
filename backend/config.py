@@ -56,7 +56,14 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemma-4-31b-it:free").strip()
+# An optional second Gemini key, ideally from another Google account: it has its own free quota, so when the first
+# key hits its limit (error 429) the second one answers. Empty = not used.
+GEMINI_API_KEY_2 = os.getenv("GEMINI_API_KEY_2", "").strip()
 LLM_PROVIDER_ORDER = [name.strip() for name in os.getenv("LLM_PROVIDER_ORDER", "gemini,groq,openrouter").split(",") if name.strip()]
+# The second key is tried right after the first one, even if LLM_PROVIDER_ORDER (for example in .env) does not list it.
+# A provider without a key is skipped anyway.
+if "gemini" in LLM_PROVIDER_ORDER and "gemini2" not in LLM_PROVIDER_ORDER:
+    LLM_PROVIDER_ORDER.insert(LLM_PROVIDER_ORDER.index("gemini") + 1, "gemini2")
 # After a provider fails (quota, overload, network), skip it for this many seconds, then try it again.
 LLM_COOLDOWN_SECONDS = float(os.getenv("LLM_COOLDOWN_SECONDS", "60"))
 LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "30"))
@@ -64,6 +71,12 @@ LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "30"))
 # a reply we count it as failed and move on to the next provider.
 GEMINI_TIMEOUT_SECONDS = float(os.getenv("GEMINI_TIMEOUT_SECONDS", "10"))
 
+
+# Answer cache: the same question (after the follow-up rewrite) gets the stored answer at once, with no search and
+# no LLM call. This saves the free Gemini quota and makes repeated demo questions instant. Only answers that were
+# found are stored. Set ANSWER_CACHE_MAX=0 to turn it off.
+ANSWER_CACHE_SECONDS = float(os.getenv("ANSWER_CACHE_SECONDS", "3600"))
+ANSWER_CACHE_MAX = int(os.getenv("ANSWER_CACHE_MAX", "200"))
 
 # Safeguards (step 16b). Limits on what POST /chat accepts.
 MAX_QUESTION_CHARS = int(os.getenv("MAX_QUESTION_CHARS", "500"))

@@ -7,6 +7,7 @@ from backend.models.schemas import ChatAnswer, ChatMessage
 from backend.services.generation_service import generate_answer, stream_answer
 from backend.services.llm_service import generate_text
 from backend.services.retrieval_service import retrieve
+from backend.utils import answer_cache
 
 # A message that is only a thank-you gets a friendly reply at once, with no search and no LLM call.
 THANKS_WORDS = {"תודה", "תודות", "תנקס", "thanks", "thank", "thx", "ty"}
@@ -74,6 +75,10 @@ def answer_question(question: str, history: list[ChatMessage] | None = None) -> 
     start = time.perf_counter()
     standalone = rewrite_question(question, recent)
     rewritten = time.perf_counter()
+    cached = answer_cache.get(standalone)
+    if cached:
+        print(f"timing: answer from cache, total {time.perf_counter() - start:.2f}s")
+        return ChatAnswer(**cached)
     result = retrieve(standalone)
     retrieved = time.perf_counter()
     answer = generate_answer(standalone, result.chunks)
@@ -82,6 +87,7 @@ def answer_question(question: str, history: list[ChatMessage] | None = None) -> 
         f"timing: rewrite {rewritten - start:.2f}s, retrieve {retrieved - rewritten:.2f}s, "
         f"answer {done - retrieved:.2f}s, total {done - start:.2f}s"
     )
+    answer_cache.put(standalone, answer.model_dump())
     return answer
 
 
@@ -96,8 +102,18 @@ def stream_answer_question(question: str, history: list[ChatMessage] | None = No
     start = time.perf_counter()
     standalone = rewrite_question(question, recent)
     rewritten = time.perf_counter()
+    cached = answer_cache.get(standalone)
+    if cached:
+        # Send the whole text as one piece first, so the page shows it with the same gentle reveal.
+        print(f"timing: answer from cache, total {time.perf_counter() - start:.2f}s (streaming)")
+        yield {"type": "delta", "text": cached["answer"]}
+        yield {"type": "final", **cached}
+        return
     result = retrieve(standalone)
     retrieved = time.perf_counter()
     print(f"timing: rewrite {rewritten - start:.2f}s, retrieve {retrieved - rewritten:.2f}s (streaming)")
-    yield from stream_answer(standalone, result.chunks)
+    for event in stream_answer(standalone, result.chunks):
+        if event["type"] == "final":
+            answer_cache.put(standalone, {key: value for key, value in event.items() if key != "type"})
+        yield event
     print(f"timing: total {time.perf_counter() - start:.2f}s (streaming)")

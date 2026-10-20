@@ -9,6 +9,7 @@ from pydantic import BaseModel, ValidationError
 
 from backend.config import (
     GEMINI_API_KEY,
+    GEMINI_API_KEY_2,
     GEMINI_MODEL,
     GEMINI_TIMEOUT_SECONDS,
     GROQ_API_KEY,
@@ -34,23 +35,22 @@ class AllProvidersFailed(RuntimeError):
 # --- One function per provider. Each returns the reply text. ---
 # `schema` is a pydantic class when we want a JSON reply, otherwise None.
 
-_gemini_client: genai.Client | None = None
+_gemini_clients: dict[str, genai.Client] = {}  # one client per API key
 
 
-def _get_gemini_client() -> genai.Client:
-    """Create the Gemini client once. Its timeout is in milliseconds."""
-    global _gemini_client
-    if _gemini_client is None:
-        _gemini_client = genai.Client(
-            api_key=GEMINI_API_KEY,
+def _get_gemini_client(api_key: str) -> genai.Client:
+    """Create the Gemini client for this key once. Its timeout is in milliseconds."""
+    if api_key not in _gemini_clients:
+        _gemini_clients[api_key] = genai.Client(
+            api_key=api_key,
             http_options=types.HttpOptions(timeout=int(GEMINI_TIMEOUT_SECONDS * 1000)),
         )
-    return _gemini_client
+    return _gemini_clients[api_key]
 
 
-def _call_gemini(system_prompt: str, prompt: str, schema: type[BaseModel] | None) -> str:
-    client = _get_gemini_client()
-    config =types.GenerateContentConfig(system_instruction=system_prompt, temperature=0.0)
+def _call_gemini(system_prompt: str, prompt: str, schema: type[BaseModel] | None, api_key: str = "") -> str:
+    client = _get_gemini_client(api_key or GEMINI_API_KEY)
+    config = types.GenerateContentConfig(system_instruction=system_prompt, temperature=0.0)
     if schema is not None:
         config.response_mime_type = "application/json"
         config.response_schema = schema
@@ -94,6 +94,9 @@ def _call_openrouter(system_prompt: str, prompt: str, schema: type[BaseModel] | 
 # name -> (function, has a key?). The key check is a function so tests can change it.
 _PROVIDERS: dict[str, tuple[Callable[..., str], Callable[[], bool]]] = {
     "gemini": (_call_gemini, lambda: bool(GEMINI_API_KEY)),
+    # A second key (another Google account) has its own free quota.
+    "gemini2": (lambda system_prompt, prompt, schema: _call_gemini(system_prompt, prompt, schema, GEMINI_API_KEY_2),
+                lambda: bool(GEMINI_API_KEY_2)),
     "groq": (_call_groq, lambda: bool(GROQ_API_KEY)),
     "openrouter": (_call_openrouter, lambda: bool(OPENROUTER_API_KEY)),
 }
@@ -139,9 +142,9 @@ def _generate(system_prompt: str, prompt: str, schema: type[M] | None) -> str | 
 # --- Streaming: the same providers, but the reply arrives in small pieces. ---
 # No retry here: before the first piece arrives, a failure just moves on to the next provider.
 
-def _stream_gemini(system_prompt: str, prompt: str) -> Iterator[str]:
+def _stream_gemini(system_prompt: str, prompt: str, api_key: str = "") -> Iterator[str]:
     config = types.GenerateContentConfig(system_instruction=system_prompt, temperature=0.0)
-    for chunk in _get_gemini_client().models.generate_content_stream(model=GEMINI_MODEL, contents=prompt, config=config):
+    for chunk in _get_gemini_client(api_key or GEMINI_API_KEY).models.generate_content_stream(model=GEMINI_MODEL, contents=prompt, config=config):
         if chunk.text:
             yield chunk.text
 
@@ -175,6 +178,7 @@ def _stream_openai_style(url: str, api_key: str, model: str, system_prompt: str,
 
 _STREAMERS: dict[str, Callable[[str, str], Iterator[str]]] = {
     "gemini": _stream_gemini,
+    "gemini2": lambda system_prompt, prompt: _stream_gemini(system_prompt, prompt, GEMINI_API_KEY_2),
     "groq": lambda system_prompt, prompt: _stream_openai_style(GROQ_URL, GROQ_API_KEY, GROQ_MODEL, system_prompt, prompt),
     "openrouter": lambda system_prompt, prompt: _stream_openai_style(
         OPENROUTER_URL, OPENROUTER_API_KEY, OPENROUTER_MODEL, system_prompt, prompt),
