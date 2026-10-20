@@ -55,15 +55,20 @@ RETRY_BASE_DELAY_SECONDS = float(os.getenv("RETRY_BASE_DELAY_SECONDS", "0.5"))
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemma-4-31b-it:free").strip()
+# Free models on OpenRouter are shared, so any of them can be rate-limited (429) at a given moment, and they come
+# and go. Gemma was often full, so the default is now minimax (tested: correct Hebrew answers, about 14s per answer).
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "minimax/minimax-m3.1-flash:free").strip()
+# A second OpenRouter model (same key) used when the first one fails. Empty = not used.
+OPENROUTER_MODEL_2 = os.getenv("OPENROUTER_MODEL_2", "poolside/laguna-s-2.1:free").strip()
 # An optional second Gemini key, ideally from another Google account: it has its own free quota, so when the first
 # key hits its limit (error 429) the second one answers. Empty = not used.
 GEMINI_API_KEY_2 = os.getenv("GEMINI_API_KEY_2", "").strip()
 LLM_PROVIDER_ORDER = [name.strip() for name in os.getenv("LLM_PROVIDER_ORDER", "gemini,groq,openrouter").split(",") if name.strip()]
 # The second key is tried right after the first one, even if LLM_PROVIDER_ORDER (for example in .env) does not list it.
 # A provider without a key is skipped anyway.
-if "gemini" in LLM_PROVIDER_ORDER and "gemini2" not in LLM_PROVIDER_ORDER:
-    LLM_PROVIDER_ORDER.insert(LLM_PROVIDER_ORDER.index("gemini") + 1, "gemini2")
+for _first, _second in (("gemini", "gemini2"), ("openrouter", "openrouter2")):
+    if _first in LLM_PROVIDER_ORDER and _second not in LLM_PROVIDER_ORDER:
+        LLM_PROVIDER_ORDER.insert(LLM_PROVIDER_ORDER.index(_first) + 1, _second)
 # After a provider fails (quota, overload, network), skip it for this many seconds, then try it again.
 LLM_COOLDOWN_SECONDS = float(os.getenv("LLM_COOLDOWN_SECONDS", "60"))
 LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "30"))

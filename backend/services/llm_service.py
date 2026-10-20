@@ -19,6 +19,7 @@ from backend.config import (
     LLM_TIMEOUT_SECONDS,
     OPENROUTER_API_KEY,
     OPENROUTER_MODEL,
+    OPENROUTER_MODEL_2,
 )
 from backend.utils.retry import call_with_retry
 
@@ -99,6 +100,10 @@ _PROVIDERS: dict[str, tuple[Callable[..., str], Callable[[], bool]]] = {
                 lambda: bool(GEMINI_API_KEY_2)),
     "groq": (_call_groq, lambda: bool(GROQ_API_KEY)),
     "openrouter": (_call_openrouter, lambda: bool(OPENROUTER_API_KEY)),
+    # The same key with another model: if one free model is full, the other may still answer.
+    "openrouter2": (lambda system_prompt, prompt, schema: _call_openai_style(
+        OPENROUTER_URL, OPENROUTER_API_KEY, OPENROUTER_MODEL_2, system_prompt, prompt, schema),
+        lambda: bool(OPENROUTER_API_KEY and OPENROUTER_MODEL_2)),
 }
 
 # When a provider may be tried again (time.monotonic value). Missing = available now.
@@ -182,6 +187,8 @@ _STREAMERS: dict[str, Callable[[str, str], Iterator[str]]] = {
     "groq": lambda system_prompt, prompt: _stream_openai_style(GROQ_URL, GROQ_API_KEY, GROQ_MODEL, system_prompt, prompt),
     "openrouter": lambda system_prompt, prompt: _stream_openai_style(
         OPENROUTER_URL, OPENROUTER_API_KEY, OPENROUTER_MODEL, system_prompt, prompt),
+    "openrouter2": lambda system_prompt, prompt: _stream_openai_style(
+        OPENROUTER_URL, OPENROUTER_API_KEY, OPENROUTER_MODEL_2, system_prompt, prompt),
 }
 
 
