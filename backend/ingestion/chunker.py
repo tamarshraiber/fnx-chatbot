@@ -12,7 +12,9 @@ IMAGE_TAG = re.compile(r"!\[[^\]]*\]\([^)]*\)")
 LINK_TAG = re.compile(r"\[([^\]]*)\]\([^)]*\)")
 # Footer blocks that are the same on every page. Everything after the first one is cut.
 FOOTER_MARKERS = ["## כל הדרכים לדבר איתנו", "כניסה לפורטלים"]
-HEADING_LINE = re.compile(r"^#{1,6}\s")
+# A heading may also be a list item: "  * ## מוקד שירות ...". The contact page is built like this, and if
+# these are not seen as headings, the page is cut every 800 characters and a phone number loses its department.
+HEADING_LINE = re.compile(r"^\s*(?:[*-]\s+)?#{1,6}\s")
 
 
 def clean_markdown(markdown: str) -> str:
