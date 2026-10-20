@@ -1,0 +1,16 @@
+# Secrets
+.env
+.env.*
+
+# Not needed in the backend image
+.venv/
+.git/
+.claude/
+frontend/
+data/
+scripts/
+supabase/
+*.md
+**/__pycache__/
+*.pyc
+*.log
