@@ -14,6 +14,10 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY", "").strip()
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-base").strip()
 # Must match the vector column size in Supabase (step 5).
 EMBEDDING_DIMENSIONS = int(os.getenv("EMBEDDING_DIMENSIONS", "768"))
+# Light mode for small servers (512 MB). A folder made by scripts/build_onnx_model.py. When it is set, QUESTIONS are
+# embedded with a compact copy of the same model (about 200 MB of memory instead of over 1 GB; the scores differ by
+# about 0.01). Documents are still embedded by the full model, so ingestion is not affected. Empty = full model.
+EMBEDDING_ONNX_DIR = os.getenv("EMBEDDING_ONNX_DIR", "").strip()
 
 # Retrieval (step 7). Chunks with a similarity below the cutoff are treated as not relevant.
 # E5 scores sit in a high, narrow range, so this is much higher than the old Gemini cutoff (0.70).
