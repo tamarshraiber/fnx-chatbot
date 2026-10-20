@@ -2,7 +2,7 @@ import hashlib
 import json
 import re
 
-from backend.ingestion import config
+from backend.ingestion import config, curated
 
 # The cookie banner starts with this text and ends with the word "סגירה" (close).
 COOKIE_BANNER = re.compile(r"שימוש בקבצי Cookies.*?סגירה", re.DOTALL)
@@ -109,6 +109,7 @@ def chunk_page(page: dict) -> list[dict]:
     for section in split_into_sections(text):
         pieces.extend(split_long_section(section))
     pieces = merge_small_pieces(pieces)
+    pieces = curated.CURATED_CHUNKS.get(page["url"], []) + pieces  # hand-written summaries come first
 
     url_id = hashlib.sha256(page["url"].encode("utf-8")).hexdigest()[:16]
     # Hash of the cleaned text: it changes only when the useful text of the page changes.
