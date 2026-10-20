@@ -9,6 +9,7 @@
 frontend/
 data/
 scripts/
+!scripts/build_onnx_model.py
 supabase/
 *.md
 **/__pycache__/
