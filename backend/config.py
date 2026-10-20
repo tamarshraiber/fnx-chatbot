@@ -50,6 +50,9 @@ LLM_PROVIDER_ORDER = [name.strip() for name in os.getenv("LLM_PROVIDER_ORDER", "
 # After a provider fails (quota, overload, network), skip it for this many seconds, then try it again.
 LLM_COOLDOWN_SECONDS = float(os.getenv("LLM_COOLDOWN_SECONDS", "60"))
 LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "30"))
+# Gemini normally answers in about 1 second, but it once hung for 2 minutes. After this many seconds without
+# a reply we count it as failed and move on to the next provider.
+GEMINI_TIMEOUT_SECONDS = float(os.getenv("GEMINI_TIMEOUT_SECONDS", "10"))
 
 
 # Safeguards (step 16b). Limits on what POST /chat accepts.

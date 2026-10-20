@@ -12,8 +12,19 @@ export class ChatError extends Error {
   }
 }
 
-/** Send one question plus the earlier messages. Returns { answer, source_url, source_title, found }. */
-export async function sendChat(question, history) {
+/** The error shown for a failed request: 429/503 = busy, 422 = bad question, anything else = our fault. */
+function errorForStatus(status, detail = "") {
+  if (status === 429 || status === 503) {
+    return new ChatError(detail || "השירות עמוס כרגע, נסו שוב בעוד כמה דקות.", true);
+  }
+  if (status === 422) {
+    return new ChatError("לא ניתן לשלוח את השאלה. נסו לקצר אותה או לנסח מחדש.", false);
+  }
+  return new ChatError("משהו השתבש בצד שלנו. נסו שוב.", true);
+}
+
+/** Post the question to `path`. Returns the response if it is OK, otherwise throws a ChatError. */
+async function post(path, question, history) {
   const body = {
     question,
     history: history.slice(-MAX_HISTORY_ITEMS).map((m) => ({
@@ -24,7 +35,7 @@ export async function sendChat(question, history) {
 
   let response;
   try {
-    response = await fetch(`${API_URL}/chat`, {
+    response = await fetch(`${API_URL}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -33,7 +44,7 @@ export async function sendChat(question, history) {
     throw new ChatError("אין חיבור לשרת. בדקו את החיבור ונסו שוב.", true);
   }
 
-  if (response.ok) return response.json();
+  if (response.ok) return response;
 
   let detail = "";
   try {
@@ -43,11 +54,49 @@ export async function sendChat(question, history) {
     // body was not JSON; use the fallback messages below
   }
 
-  if (response.status === 429 || response.status === 503) {
-    throw new ChatError(detail || "השירות עמוס כרגע, נסו שוב בעוד כמה דקות.", true);
+  throw errorForStatus(response.status, detail);
+}
+
+/** Send one question plus the earlier messages. Returns { answer, source_url, source_title, found }. */
+export async function sendChat(question, history) {
+  const response = await post("/chat", question, history);
+  return response.json();
+}
+
+/**
+ * Like sendChat, but the answer arrives in pieces. `onDelta(text)` is called for every piece,
+ * and the final { answer, source_url, source_title, found } is returned (it replaces the pieces).
+ */
+export async function streamChat(question, history, onDelta) {
+  const response = await post("/chat/stream", question, history);
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let final = null;
+
+  const handle = (line) => {
+    if (!line.trim()) return;
+    const event = JSON.parse(line);
+    if (event.type === "delta") onDelta(event.text);
+    else if (event.type === "final") final = event;
+    else if (event.type === "error") throw errorForStatus(event.status);
+  };
+
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop(); // the last piece may be half a line
+      lines.forEach(handle);
+    }
+    handle(buffer);
+  } catch (e) {
+    if (e instanceof ChatError) throw e;
+    throw new ChatError("החיבור לשרת נותק באמצע התשובה. נסו שוב.", true);
   }
-  if (response.status === 422) {
-    throw new ChatError("לא ניתן לשלוח את השאלה. נסו לקצר אותה או לנסח מחדש.", false);
-  }
-  throw new ChatError("משהו השתבש בצד שלנו. נסו שוב.", true);
+
+  if (!final) throw new ChatError("החיבור לשרת נותק באמצע התשובה. נסו שוב.", true);
+  return final;
 }

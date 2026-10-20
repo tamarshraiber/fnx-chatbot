@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { ChatError, sendChat } from "../api";
+import { ChatError, streamChat } from "../api";
 
 const STORAGE_KEY = "phoenix-chat-messages";
 
@@ -45,13 +45,25 @@ export function useChat() {
     setLoading(true);
     setError(null);
     lastRequest.current = { question, history };
+    let id = null; // id of the assistant message, once the first words arrive
+    const withoutMine = () => messagesRef.current.filter((m) => m.id !== id);
     try {
-      const result = await sendChat(question, history);
+      let text = "";
+      const result = await streamChat(question, history, (delta) => {
+        if (mySession !== session.current) return;
+        text += delta;
+        id ??= nextId++;
+        // Show the words as they arrive. Not saved yet: the finished message is saved below.
+        const next = [...withoutMine(), { id, role: "assistant", content: text, found: true, streaming: true }];
+        messagesRef.current = next;
+        setMessages(next);
+      });
       if (mySession !== session.current) return;
+      id ??= nextId++;
       update([
-        ...messagesRef.current,
+        ...withoutMine(),
         {
-          id: nextId++,
+          id,
           role: "assistant",
           content: result.answer,
           sourceUrl: result.source_url,
@@ -61,6 +73,7 @@ export function useChat() {
       ]);
     } catch (e) {
       if (mySession !== session.current) return;
+      if (id !== null) update(withoutMine()); // drop the half-written answer
       const known = e instanceof ChatError;
       setError({
         message: known ? e.message : "משהו השתבש. נסו שוב.",

@@ -1,9 +1,10 @@
 import random
 import re
 import time
+from typing import Iterator
 
 from backend.models.schemas import ChatAnswer, ChatMessage
-from backend.services.generation_service import generate_answer
+from backend.services.generation_service import generate_answer, stream_answer
 from backend.services.llm_service import generate_text
 from backend.services.retrieval_service import retrieve
 
@@ -82,3 +83,21 @@ def answer_question(question: str, history: list[ChatMessage] | None = None) -> 
         f"answer {done - retrieved:.2f}s, total {done - start:.2f}s"
     )
     return answer
+
+
+def stream_answer_question(question: str, history: list[ChatMessage] | None = None) -> Iterator[dict]:
+    """Like answer_question, but yields events as the answer is written (see generation_service.stream_answer)."""
+    thanks = _thanks_reply(question)
+    if thanks:
+        yield {"type": "final", **ChatAnswer(answer=thanks, source_url=None, found=True).model_dump()}
+        return
+
+    recent = (history or [])[-MAX_HISTORY_MESSAGES:]
+    start = time.perf_counter()
+    standalone = rewrite_question(question, recent)
+    rewritten = time.perf_counter()
+    result = retrieve(standalone)
+    retrieved = time.perf_counter()
+    print(f"timing: rewrite {rewritten - start:.2f}s, retrieve {retrieved - rewritten:.2f}s (streaming)")
+    yield from stream_answer(standalone, result.chunks)
+    print(f"timing: total {time.perf_counter() - start:.2f}s (streaming)")

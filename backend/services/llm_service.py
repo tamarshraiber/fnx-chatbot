@@ -1,5 +1,6 @@
+import json
 import time
-from typing import Callable, TypeVar
+from typing import Callable, Iterator, TypeVar
 
 import httpx
 from google import genai
@@ -9,6 +10,7 @@ from pydantic import BaseModel, ValidationError
 from backend.config import (
     GEMINI_API_KEY,
     GEMINI_MODEL,
+    GEMINI_TIMEOUT_SECONDS,
     GROQ_API_KEY,
     GROQ_MODEL,
     LLM_COOLDOWN_SECONDS,
@@ -35,15 +37,24 @@ class AllProvidersFailed(RuntimeError):
 _gemini_client: genai.Client | None = None
 
 
-def _call_gemini(system_prompt: str, prompt: str, schema: type[BaseModel] | None) -> str:
+def _get_gemini_client() -> genai.Client:
+    """Create the Gemini client once. Its timeout is in milliseconds."""
     global _gemini_client
     if _gemini_client is None:
-        _gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-    config = types.GenerateContentConfig(system_instruction=system_prompt, temperature=0.0)
+        _gemini_client = genai.Client(
+            api_key=GEMINI_API_KEY,
+            http_options=types.HttpOptions(timeout=int(GEMINI_TIMEOUT_SECONDS * 1000)),
+        )
+    return _gemini_client
+
+
+def _call_gemini(system_prompt: str, prompt: str, schema: type[BaseModel] | None) -> str:
+    client = _get_gemini_client()
+    config =types.GenerateContentConfig(system_instruction=system_prompt, temperature=0.0)
     if schema is not None:
         config.response_mime_type = "application/json"
         config.response_schema = schema
-    response = call_with_retry(lambda: _gemini_client.models.generate_content(
+    response = call_with_retry(lambda: client.models.generate_content(
         model=GEMINI_MODEL, contents=prompt, config=config,
     ))
     return response.text or ""
@@ -122,6 +133,82 @@ def _generate(system_prompt: str, prompt: str, schema: type[M] | None) -> str | 
             continue
         _blocked_until.pop(name, None)
         return result
+    raise AllProvidersFailed("; ".join(errors_seen) or "no LLM provider has a key")
+
+
+# --- Streaming: the same providers, but the reply arrives in small pieces. ---
+# No retry here: before the first piece arrives, a failure just moves on to the next provider.
+
+def _stream_gemini(system_prompt: str, prompt: str) -> Iterator[str]:
+    config = types.GenerateContentConfig(system_instruction=system_prompt, temperature=0.0)
+    for chunk in _get_gemini_client().models.generate_content_stream(model=GEMINI_MODEL, contents=prompt, config=config):
+        if chunk.text:
+            yield chunk.text
+
+
+def _stream_openai_style(url: str, api_key: str, model: str, system_prompt: str, prompt: str) -> Iterator[str]:
+    """Groq and OpenRouter send the reply as lines that look like `data: {json}`, ending with `data: [DONE]`."""
+    body = {
+        "model": model,
+        "temperature": 0.0,
+        "stream": True,
+        "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": prompt}],
+    }
+    with httpx.stream("POST", url, headers={"Authorization": f"Bearer {api_key}"}, json=body,
+                      timeout=LLM_TIMEOUT_SECONDS) as response:
+        response.raise_for_status()
+        for line in response.iter_lines():
+            if not line.startswith("data:"):
+                continue  # blank lines and comments such as ": OPENROUTER PROCESSING"
+            data = line[len("data:"):].strip()
+            if data == "[DONE]":
+                break
+            try:
+                choices = json.loads(data)["choices"]
+            except (ValueError, KeyError):
+                continue
+            if choices:
+                piece = (choices[0].get("delta") or {}).get("content")
+                if piece:
+                    yield piece
+
+
+_STREAMERS: dict[str, Callable[[str, str], Iterator[str]]] = {
+    "gemini": _stream_gemini,
+    "groq": lambda system_prompt, prompt: _stream_openai_style(GROQ_URL, GROQ_API_KEY, GROQ_MODEL, system_prompt, prompt),
+    "openrouter": lambda system_prompt, prompt: _stream_openai_style(
+        OPENROUTER_URL, OPENROUTER_API_KEY, OPENROUTER_MODEL, system_prompt, prompt),
+}
+
+
+def stream_text(system_prompt: str, prompt: str) -> Iterator[str]:
+    """Yield the reply in pieces from the first provider that works.
+
+    If a provider fails before sending anything, the next one is tried. If it fails after the
+    first piece, the error is raised, because the user has already seen part of the answer.
+    """
+    errors_seen: list[str] = []
+    for name in _candidates():
+        started = time.perf_counter()
+        sent_anything = False
+        try:
+            for piece in _STREAMERS[name](system_prompt, prompt):
+                if not sent_anything:
+                    print(f"LLM {name} first words after {time.perf_counter() - started:.2f}s")
+                    sent_anything = True
+                yield piece
+        except Exception as error:
+            if sent_anything:
+                raise
+            _blocked_until[name] = time.monotonic() + LLM_COOLDOWN_SECONDS
+            errors_seen.append(f"{name}: {type(error).__name__} {error}")
+            print(f"LLM {name} failed ({type(error).__name__}), trying the next provider for {LLM_COOLDOWN_SECONDS:.0f}s.")
+            continue
+        if sent_anything:
+            _blocked_until.pop(name, None)
+            print(f"LLM {name} finished streaming in {time.perf_counter() - started:.2f}s")
+            return
+        errors_seen.append(f"{name}: empty reply")
     raise AllProvidersFailed("; ".join(errors_seen) or "no LLM provider has a key")
 
 
