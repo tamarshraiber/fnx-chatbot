@@ -16,12 +16,22 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-base").
 EMBEDDING_DIMENSIONS = int(os.getenv("EMBEDDING_DIMENSIONS", "768"))
 
 # Retrieval (step 7). Chunks with a similarity below the cutoff are treated as not relevant.
-# 0.84 fits the local E5 model on the full site (answerable questions >= 0.86, off-topic questions <= 0.81).
 # E5 scores sit in a high, narrow range, so this is much higher than the old Gemini cutoff (0.70).
-# We recalibrate it again with the eval questions (step 14/15).
-RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", "0.84"))
+# It was 0.84, but real questions such as "what is the customer service phone number" score only 0.82-0.83
+# (their answer is in a table), while some off-topic questions score up to 0.84, so the score alone cannot
+# separate them. The cutoff is now 0.80: it only removes clearly unrelated chunks, and the LLM prompt
+# (answer only from the chunks, otherwise NOT_FOUND) refuses the rest.
+RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", "0.80"))
 # How many chunks we ask the database for.
 TOP_K = int(os.getenv("TOP_K", "5"))
+
+# Search asks the database for TOP_K * this many chunks, because identical copies of one page (stored under
+# several URLs) are removed afterwards. Without this the copies fill all the slots.
+FETCH_MULTIPLIER = int(os.getenv("FETCH_MULTIPLIER", "3"))
+# A relevant chunk is often a page heading, while the answer (a phone table, a list) sits in the chunks after it.
+# For the best NEIGHBOR_PARENTS chunks we also add the NEIGHBOR_CHUNKS chunks that follow them on the same page.
+NEIGHBOR_PARENTS = int(os.getenv("NEIGHBOR_PARENTS", "2"))
+NEIGHBOR_CHUNKS = int(os.getenv("NEIGHBOR_CHUNKS", "2"))
 
 # Rerank (step 15). Cohere re-scores the chunks that vector search found, by reading question and chunk together.
 # Off by default until the eval set shows it helps. Turn on with RERANK_ENABLED=true.

@@ -40,6 +40,20 @@ def search(query_embedding: list[float], top_k: int = 5) -> list[dict]:
     return response.data
 
 
+def get_chunks_by_ids(chunk_ids: list[str]) -> list[dict]:
+    """Return the chunks with these ids (url, title, text, ...), in one request. Missing ids are just left out."""
+    if not chunk_ids:
+        return []
+    response = (
+        _get_client()
+        .table(TABLE)
+        .select("chunk_id, url, title, text, lastmod")
+        .in_("chunk_id", chunk_ids)
+        .execute()
+    )
+    return response.data
+
+
 def list_page_hashes() -> dict[str, str | None]:
     """Return {page url: content_hash} for every page stored in the database."""
     client = _get_client()
