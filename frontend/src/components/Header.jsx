@@ -14,6 +14,7 @@ export default function Header({ mode, hasMessages, onNewChat, onToggleMode, onC
         </span>
       </button>
       <div className="header__actions">
+        {!widget && <a className="header__link" href="#/stats">איכות ושקיפות</a>}
         {hasMessages && (
           <button type="button" className="icon-btn" onClick={onNewChat} title="שיחה חדשה" aria-label="שיחה חדשה">
             <NewChatIcon />

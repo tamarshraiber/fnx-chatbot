@@ -8,6 +8,7 @@ from fastapi.responses import StreamingResponse
 from backend.models.schemas import ChatAnswer, ChatRequest
 from backend.services.chat_service import answer_question, stream_answer_question
 from backend.services.llm_service import AllProvidersFailed
+from backend.services.stats_service import get_public_stats
 from backend.utils.rate_limit import check_rate_limit
 
 router = APIRouter()
@@ -26,6 +27,12 @@ def chat(request: ChatRequest) -> ChatAnswer:
         raise HTTPException(status_code=503, detail=BUSY_MESSAGE) from error
     except Exception as error:
         raise HTTPException(status_code=500, detail="Could not answer the question.") from error
+
+
+@router.get("/stats")
+def stats() -> dict:
+    """Public totals for the quality page: pages in the database, last refresh, latest evaluation scores."""
+    return get_public_stats()
 
 
 def _as_lines(events: Iterator[dict]) -> Iterator[str]:

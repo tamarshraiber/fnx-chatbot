@@ -76,6 +76,15 @@ def list_page_hashes() -> dict[str, str | None]:
         start += page_size
 
 
+def get_stats() -> dict:
+    """Return {"pages": number of pages, "chunks": number of chunks, "last_refresh": newest crawl time or None}."""
+    table = _get_client().table(TABLE)
+    pages = table.select("chunk_id", count="exact").eq("chunk_index", 0).limit(1).execute().count
+    chunks = table.select("chunk_id", count="exact").limit(1).execute().count
+    newest = table.select("crawled_at").order("crawled_at", desc=True).limit(1).execute().data
+    return {"pages": pages, "chunks": chunks, "last_refresh": newest[0]["crawled_at"] if newest else None}
+
+
 def delete_by_url(url: str) -> None:
     """Delete all chunks of one page (used when a page is removed or changed)."""
     _get_client().table(TABLE).delete().eq("url", url).execute()

@@ -1,0 +1,11 @@
+{
+  "eval": {
+    "date": "2026-10-21",
+    "answerable_correct": 19,
+    "answerable_total": 20,
+    "unanswerable_rejected": 7,
+    "unanswerable_total": 10,
+    "retrieval_top5": 20,
+    "retrieval_total": 20
+  }
+}

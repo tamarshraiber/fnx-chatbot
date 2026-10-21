@@ -57,6 +57,23 @@ async function post(path, question, history) {
   throw errorForStatus(response.status, detail);
 }
 
+/** Wake the server up (a free server sleeps when unused). Silent: the answer and any error are ignored. */
+export function wakeServer() {
+  return fetch(`${API_URL}/health`).catch(() => {});
+}
+
+/** The public totals for the quality page. */
+export async function fetchStats() {
+  let response;
+  try {
+    response = await fetch(`${API_URL}/stats`);
+  } catch {
+    throw new ChatError("אין חיבור לשרת. בדקו את החיבור ונסו שוב.", true);
+  }
+  if (!response.ok) throw errorForStatus(response.status);
+  return response.json();
+}
+
 /** Send one question plus the earlier messages. Returns { answer, source_url, source_title, found }. */
 export async function sendChat(question, history) {
   const response = await post("/chat", question, history);

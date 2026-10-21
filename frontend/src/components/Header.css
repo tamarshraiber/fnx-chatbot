@@ -36,4 +36,12 @@
 .header__titles { display: flex; flex-direction: column; line-height: 1.2; }
 .header__name { font-weight: 700; font-size: 18px; color: var(--brand); }
 .header__sub { font-size: 13px; color: var(--text-muted); }
-.header__actions { display: flex; gap: var(--space-1); }
+.header__actions { display: flex; align-items: center; gap: var(--space-1); }
+.header__link {
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.header__link:hover { color: var(--brand); background: var(--bg); }

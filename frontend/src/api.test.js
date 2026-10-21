@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ChatError, sendChat, streamChat } from "./api";
+import { ChatError, fetchStats, sendChat, streamChat, wakeServer } from "./api";
 
 const FINAL = { type: "final", answer: "תשובה", source_url: "https://www.fnx.co.il/a", source_title: "כותרת", found: true };
 
@@ -144,6 +144,26 @@ describe("errors", () => {
     expect(error).toBeInstanceOf(ChatError);
     expect(error.canRetry).toBe(true);
     expect(error.message).toContain("חיבור");
+  });
+});
+
+describe("wakeServer", () => {
+  it("calls /health and never throws, even when the server cannot be reached", async () => {
+    const fake = fakeFetch(new TypeError("Failed to fetch"));
+    await expect(wakeServer()).resolves.toBeUndefined();
+    expect(fake.mock.calls[0][0]).toMatch(/\/health$/);
+  });
+});
+
+describe("fetchStats", () => {
+  it("returns the JSON totals", async () => {
+    fakeFetch(new Response(JSON.stringify({ pages: 5 }), { status: 200 }));
+    expect(await fetchStats()).toEqual({ pages: 5 });
+  });
+
+  it("gives a ChatError when the server fails", async () => {
+    fakeFetch(new Response("{}", { status: 500 }));
+    expect(await fetchStats().catch((e) => e)).toBeInstanceOf(ChatError);
   });
 });
 

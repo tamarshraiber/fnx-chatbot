@@ -37,7 +37,7 @@ answer is not on the website it says so and sends the user to customer service. 
 - The cutoff is low on purpose, so that real questions are not refused. Because of that, a question close to the
   website's topics can get an answer built from a loosely related page.
 - The test set is small (30 questions), so the numbers show a direction, not a guarantee.
-- A few pages were empty or could not be fetched (1,064 of the 1,133 saved pages are in the database).
+- A few pages were empty or could not be fetched (1,075 of the 1,143 selected pages are in the database).
 - The free servers (Render, Gemini free tier) can be slow to wake up or hit rate limits; the backup models help but
   can answer in a slightly different style.
 - Chat history lives only in the browser; nothing is saved on the server.

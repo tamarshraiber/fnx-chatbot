@@ -20,6 +20,7 @@ from backend.services.chat_service import answer_question
 EVAL_DIR = Path(__file__).resolve().parent.parent / "data" / "eval"
 EVAL_FILE = EVAL_DIR / "eval_set.json"
 HISTORY_FILE = EVAL_DIR / "e2e_history.json"
+STATS_FILE = Path(__file__).resolve().parent.parent / "backend" / "stats.json"
 PAUSE_SECONDS = 4  # keeps us under the free-tier request limits
 
 
@@ -61,6 +62,19 @@ def main() -> None:
     print("\n===== SUMMARY =====")
     for key, value in summary.items():
         print(f"{key}: {value}")
+
+    if limit is None:  # a full run also updates the public numbers shown on the quality page
+        stats = json.loads(STATS_FILE.read_text(encoding="utf-8")) if STATS_FILE.exists() else {}
+        stats["eval"] = {
+            **stats.get("eval", {}),
+            "date": summary["time"][:10],
+            "answerable_correct": count("answerable", True),
+            "answerable_total": count("answerable"),
+            "unanswerable_rejected": count("unanswerable", True),
+            "unanswerable_total": count("unanswerable"),
+        }
+        STATS_FILE.write_text(json.dumps(stats, indent=2), encoding="utf-8")
+        print(f"Updated {STATS_FILE}")
 
     history = json.loads(HISTORY_FILE.read_text(encoding="utf-8")) if HISTORY_FILE.exists() else []
     history.append({**summary, "rows": rows})
