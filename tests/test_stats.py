@@ -1,4 +1,6 @@
 """The public /stats numbers: totals only, cached, and still available when the database is down."""
+import json
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -21,7 +23,8 @@ def test_stats_have_the_database_numbers_and_the_eval_scores(monkeypatch):
     monkeypatch.setattr(stats_service.vector_repository, "get_stats", lambda: DATA)
     body = client.get("/stats").json()
     assert body["pages"] == 1064
-    assert body["eval"]["answerable_total"] == 20
+    saved = json.loads(stats_service.STATS_FILE.read_text(encoding="utf-8"))["eval"]
+    assert body["eval"]["answerable_total"] == saved["answerable_total"]  # whatever the last evaluation run saved
 
 
 def test_stats_are_cached(monkeypatch):
