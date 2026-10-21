@@ -68,7 +68,7 @@ Status: DONE / NEXT / TODO
 4. Step 26 is tuned (19/20 and 7/10). Optional: decide whether purchase tax and EV vs petrol should count as answerable, and re-run when the LLM quota is fresh.
 5. Step 15: decide on rerank / hybrid (15c) after item 4, or close it.
 6. Quality gates (partly there): the refresh already stops if the sitemap looks broken and deletes only pages the site says are 404/410. Not done: index versioning (load a new version, switch when complete) and "the eval must pass before a refresh goes live".
-7. Hackathon deliverables: short summary (data collection, chunk selection, limitations, refresh process), demo of 20-30 questions, link to the working chatbot.
+7. Hackathon deliverables: DONE: SUMMARY.md (data collection, chunk selection, limitations, refresh process; check the numbers again after the next refresh). TODO: demo of 20-30 questions (the e2e eval output can be used) and the link to the working chatbot.
 8. After the hackathon: delete or rotate the secrets (Gemini, Supabase, OpenRouter, Groq, Cohere).
 
 ## Working rules (from CLAUDE.md)
