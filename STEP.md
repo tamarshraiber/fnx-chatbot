@@ -59,7 +59,7 @@ Status: DONE / NEXT / TODO
 | # | Step | Status | Notes |
 |---|---|---|---|
 | 24 | Docker + light embedding mode | DONE (code) | Dockerfile (2 stages), .dockerignore, scripts/build_onnx_model.py. Questions are embedded by a compact int8 ONNX copy of multilingual-e5-base (word table read from disk, small sentencepiece tokenizer, no torch on the server); about 300 MB instead of over 1 GB, so it fits Render's 512 MB. Documents still use the full model, so the stored vectors stay valid. The build fails if the compact copy is below cosine 0.97 to the full model. Switch: EMBEDDING_ONNX_DIR (empty = full model). |
-| 25 | Live deployment | NOT CONFIRMED | README says Render (backend, /health) and Vercel (frontend, root folder frontend, VITE_API_URL). Nothing in the repo shows it is live. Check: both links open, a real question gets a cited answer, memory stays under 512 MB. |
+| 25 | Live deployment | PARTIAL | README says Render (backend, /health) and Vercel (frontend, root folder frontend, VITE_API_URL). Backend is up: https://fnx-chatbot.onrender.com answers (the root shows {"detail":"Not Found"}, which is normal; the API has no page at /). Not checked yet: /health, a real question, the frontend on Vercel, CORS_ORIGINS set to the Vercel address. Check: both links open, a real question gets a cited answer, memory stays under 512 MB. |
 
 ## Still to do (short list)
 1. Step 25: confirm the live links work on the 512 MB server (waiting for NetFree to open the site).
