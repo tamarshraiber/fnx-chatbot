@@ -22,4 +22,5 @@ export const CarIcon = () => (<svg {...base}><path d="M5 16H3v-4l2-5a2 2 0 0 1 1
 export const HomeIcon = () => (<svg {...base}><path d="m3 11 9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M10 20v-6h4v6" /></svg>);
 export const TravelIcon = () => (<svg {...base}><path d="M10.5 13.5 3 11l1-2 8 1 4-6 2 .5-1.5 7 5 1.5v2l-6.5-.5-3 5-1.5-.5Z" /></svg>);
 export const SupportIcon = () => (<svg {...base}><path d="M4 14v-2a8 8 0 0 1 16 0v2" /><rect x="3" y="14" width="4" height="6" rx="1.5" /><rect x="17" y="14" width="4" height="6" rx="1.5" /><path d="M19 20a4 4 0 0 1-4 2h-2" /></svg>);
+export const QualityIcon = () => (<svg {...base}><path d="M12 3 5 6v5c0 4.4 2.9 8.2 7 10 4.1-1.8 7-5.6 7-10V6l-7-3Z" /><path d="M9 14v-2" /><path d="M12 14v-4" /><path d="M15 14v-3" /></svg>);
 export const RetryIcon = () => (<svg {...base}><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 4v7h-7" /></svg>);

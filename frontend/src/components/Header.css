@@ -37,11 +37,33 @@
 .header__name { font-weight: 700; font-size: 18px; color: var(--brand); }
 .header__sub { font-size: 13px; color: var(--text-muted); }
 .header__actions { display: flex; align-items: center; gap: var(--space-1); }
+/* the quality page link: an orange pill with an icon, so it is easy to notice */
 .header__link {
-  padding: 6px 10px;
-  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--warn-border);
+  border-radius: 999px;
+  background: var(--warn-bg);
   font-size: 13px;
-  color: var(--text-muted);
+  font-weight: 600;
+  color: var(--accent);
   text-decoration: none;
+  animation: header-glow 2.4s ease-out 1s 1;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
-.header__link:hover { color: var(--brand); background: var(--bg); }
+.header__link svg { width: 16px; height: 16px; }
+.header__link:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+/* the small chat window has little room: icon only (the text stays as the tooltip and screen-reader label) */
+.header__link--compact { padding: 6px; }
+.header__link--compact .header__link-text { display: none; }
+
+@keyframes header-glow {
+  0% { box-shadow: 0 0 0 0 rgba(242, 106, 33, 0.55); }
+  70% { box-shadow: 0 0 0 10px rgba(242, 106, 33, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(242, 106, 33, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .header__link { animation: none; transition: none; }
+}

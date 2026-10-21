@@ -1,5 +1,5 @@
 import Logo from "./Logo";
-import { CloseIcon, ExpandIcon, NewChatIcon, ShrinkIcon } from "./Icons";
+import { CloseIcon, ExpandIcon, NewChatIcon, QualityIcon, ShrinkIcon } from "./Icons";
 import "./Header.css";
 
 export default function Header({ mode, hasMessages, onNewChat, onToggleMode, onClose }) {
@@ -14,7 +14,15 @@ export default function Header({ mode, hasMessages, onNewChat, onToggleMode, onC
         </span>
       </button>
       <div className="header__actions">
-        {!widget && <a className="header__link" href="#/stats">איכות ושקיפות</a>}
+        <a
+          className={`header__link${widget ? " header__link--compact" : ""}`}
+          href="#/stats"
+          title="איכות ושקיפות"
+          aria-label="איכות ושקיפות"
+        >
+          <QualityIcon />
+          <span className="header__link-text">איכות ושקיפות</span>
+        </a>
         {hasMessages && (
           <button type="button" className="icon-btn" onClick={onNewChat} title="שיחה חדשה" aria-label="שיחה חדשה">
             <NewChatIcon />

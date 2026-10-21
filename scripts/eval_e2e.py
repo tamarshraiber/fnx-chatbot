@@ -22,14 +22,20 @@ EVAL_FILE = EVAL_DIR / "eval_set.json"
 HISTORY_FILE = EVAL_DIR / "e2e_history.json"
 STATS_FILE = Path(__file__).resolve().parent.parent / "backend" / "stats.json"
 PAUSE_SECONDS = 4  # keeps us under the free-tier request limits
+RETRY_PAUSE_SECONDS = 60  # how long to wait before asking again after an error
 
 
 def ask(question: str) -> dict:
-    try:
-        answer = answer_question(question, [])
-    except Exception as error:  # a failed call counts as a failed question, the run goes on
-        return {"error": type(error).__name__, "found": None, "source_url": None, "answer": ""}
-    return {"found": answer.found, "source_url": answer.source_url, "answer": answer.answer}
+    # A failed call is usually a free-tier rate limit (429), not a wrong answer: wait, then try once more.
+    for attempt in range(2):
+        try:
+            answer = answer_question(question, [])
+        except Exception as error:
+            if attempt == 0:
+                time.sleep(RETRY_PAUSE_SECONDS)
+                continue
+            return {"error": type(error).__name__, "found": None, "source_url": None, "answer": ""}
+        return {"found": answer.found, "source_url": answer.source_url, "answer": answer.answer}
 
 
 def main() -> None:
@@ -39,17 +45,21 @@ def main() -> None:
     for kind in ("answerable", "unanswerable"):
         for item in data[kind][:limit]:
             result = ask(item["question"])
-            if kind == "answerable":
+            if result.get("error"):
+                ok = None  # no answer at all (even after the retry): not scored, neither right nor wrong
+            elif kind == "answerable":
                 url = result["source_url"] or ""
                 ok = bool(result["found"]) and any(part in url for part in item["expected"])
             else:
                 ok = result["found"] is False
             rows.append({"kind": kind, "question": item["question"], "ok": ok, **result})
-            print(f"[{'OK ' if ok else 'BAD'}] {kind[:6]}: {item['question']} -> {result['source_url']}")
+            label = "N/A" if ok is None else "OK " if ok else "BAD"
+            print(f"[{label}] {kind[:6]}: {item['question']} -> {result['source_url']}")
             time.sleep(PAUSE_SECONDS)
 
     def count(kind: str, ok: bool | None = None) -> int:
-        return sum(1 for row in rows if row["kind"] == kind and (ok is None or row["ok"] == ok))
+        """Questions of this kind that were scored (no ok given), or scored right/wrong (ok given). Errors never count."""
+        return sum(1 for row in rows if row["kind"] == kind and row["ok"] is not None and (ok is None or row["ok"] == ok))
 
     summary = {
         "time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -57,6 +67,7 @@ def main() -> None:
         "rerank": RERANK_ENABLED,
         "answerable_correct": f"{count('answerable', True)}/{count('answerable')}",
         "unanswerable_rejected": f"{count('unanswerable', True)}/{count('unanswerable')}",
+        "not_scored": sum(1 for row in rows if row["ok"] is None),
         "errors": sum(1 for row in rows if row.get("error")),
     }
     print("\n===== SUMMARY =====")
