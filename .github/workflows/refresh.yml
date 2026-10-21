@@ -1,0 +1,40 @@
+# Weekly refresh of the chatbot data: crawl new/changed pages, embed them, update Supabase.
+# Needs two repository secrets: SUPABASE_URL and SUPABASE_KEY (Settings > Secrets and variables > Actions).
+# Start it by hand from the Actions tab ("Run workflow"), or wait for the weekly schedule.
+name: refresh-data
+
+on:
+  schedule:
+    - cron: "0 3 * * 0" # Sundays 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      # CPU-only torch is much smaller than the default build.
+      - run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -r requirements.txt
+      - run: crawl4ai-setup
+      # data/ is not in git. Keep the crawled pages between runs, so only new/changed pages are crawled again.
+      - uses: actions/cache@v4
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+      - run: python -m backend.ingestion.run
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: refresh-report
+          path: data/logs/
+          if-no-files-found: ignore

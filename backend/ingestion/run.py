@@ -13,6 +13,7 @@ import argparse
 import asyncio
 import json
 import time
+from datetime import datetime, timezone
 from urllib.parse import urlparse
 
 from google.genai import errors
@@ -39,6 +40,20 @@ def upload_with_quota_wait(chunks: list[dict]) -> None:
                 raise
             print(f"Too many requests. Waiting {config.QUOTA_WAIT_SECONDS}s (wait {attempt} of {config.QUOTA_WAIT_ATTEMPTS - 1})...")
             time.sleep(config.QUOTA_WAIT_SECONDS)
+
+
+def write_report(added, updated, removed, failed, kept, unchanged, left) -> None:
+    """Save what this run did (added / updated / removed pages) to data/logs, one file per run."""
+    now = datetime.now(timezone.utc)
+    report = {
+        "time": now.isoformat(timespec="seconds"),
+        "counts": {"added": len(added), "updated": len(updated), "removed": len(removed), "failed": len(failed), "kept": len(kept), "unchanged": unchanged, "still_waiting": left},
+        "added": added, "updated": updated, "removed": removed, "failed": failed, "kept": kept,
+    }
+    config.LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    path = config.LOGS_DIR / f"refresh-{now:%Y%m%d-%H%M%S}.json"
+    path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"Report saved to {path}")
 
 
 def main() -> None:
@@ -145,6 +160,7 @@ def main() -> None:
     left = len(pending) - done
     if left > 0:
         print(f"Still waiting to be embedded: {left} pages{' (quota)' if quota_hit else ''}. Run again to continue.")
+    write_report(added, updated, to_delete, failed, to_keep, unchanged, left)
     for label, urls in (("ADDED", added), ("UPDATED", updated), ("REMOVED", to_delete), ("FAILED", failed), ("KEPT", to_keep)):
         for url in urls:
             print(f"  {label}: {url}")

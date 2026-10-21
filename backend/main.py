@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -8,6 +9,10 @@ from backend.controllers.chat_controller import router as chat_router
 from backend.repositories import vector_repository
 from backend.services.embedding_service import embed_question
 
+# One format for all server messages (time, level, module), so they are easy to search in the hosting logs.
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,7 +22,7 @@ async def lifespan(app: FastAPI):
     try:
         vector_repository.search(vector, top_k=1)
     except Exception as error:  # the server must still start if the database is down; questions will show the error
-        print(f"Supabase warm-up failed ({type(error).__name__}). Continuing without it.")
+        logger.warning(f"Supabase warm-up failed ({type(error).__name__}). Continuing without it.")
     yield
 
 

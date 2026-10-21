@@ -1,3 +1,4 @@
+import logging
 import json
 import time
 from typing import Callable, Iterator, TypeVar
@@ -22,6 +23,8 @@ from backend.config import (
     OPENROUTER_MODEL_2,
 )
 from backend.utils.retry import call_with_retry
+
+logger = logging.getLogger(__name__)
 
 M = TypeVar("M", bound=BaseModel)
 
@@ -127,17 +130,17 @@ def _generate(system_prompt: str, prompt: str, schema: type[M] | None) -> str | 
         try:
             text = function(system_prompt, prompt, schema)
             result = text.strip() if schema is None else schema.model_validate_json(text)
-            print(f"LLM {name} answered in {time.perf_counter() - started:.2f}s")
+            logger.info(f"LLM {name} answered in {time.perf_counter() - started:.2f}s")
         except ValidationError as error:
             # The provider answered but not in the right shape. Try the next one, no cooldown.
             errors_seen.append(f"{name}: bad JSON ({error.error_count()} errors)")
-            print(f"LLM {name} returned bad JSON, trying the next provider.")
+            logger.warning(f"LLM {name} returned bad JSON, trying the next provider.")
             continue
         except Exception as error:
             # Quota, overload, network, etc. Skip this provider for a while.
             _blocked_until[name] = time.monotonic() + LLM_COOLDOWN_SECONDS
             errors_seen.append(f"{name}: {type(error).__name__} {error}")
-            print(f"LLM {name} failed ({type(error).__name__}), trying the next provider for {LLM_COOLDOWN_SECONDS:.0f}s.")
+            logger.warning(f"LLM {name} failed ({type(error).__name__}), trying the next provider for {LLM_COOLDOWN_SECONDS:.0f}s.")
             continue
         _blocked_until.pop(name, None)
         return result
@@ -205,7 +208,7 @@ def stream_text(system_prompt: str, prompt: str) -> Iterator[str]:
         try:
             for piece in _STREAMERS[name](system_prompt, prompt):
                 if not sent_anything:
-                    print(f"LLM {name} first words after {time.perf_counter() - started:.2f}s")
+                    logger.info(f"LLM {name} first words after {time.perf_counter() - started:.2f}s")
                     sent_anything = True
                 yield piece
         except Exception as error:
@@ -213,11 +216,11 @@ def stream_text(system_prompt: str, prompt: str) -> Iterator[str]:
                 raise
             _blocked_until[name] = time.monotonic() + LLM_COOLDOWN_SECONDS
             errors_seen.append(f"{name}: {type(error).__name__} {error}")
-            print(f"LLM {name} failed ({type(error).__name__}), trying the next provider for {LLM_COOLDOWN_SECONDS:.0f}s.")
+            logger.warning(f"LLM {name} failed ({type(error).__name__}), trying the next provider for {LLM_COOLDOWN_SECONDS:.0f}s.")
             continue
         if sent_anything:
             _blocked_until.pop(name, None)
-            print(f"LLM {name} finished streaming in {time.perf_counter() - started:.2f}s")
+            logger.info(f"LLM {name} finished streaming in {time.perf_counter() - started:.2f}s")
             return
         errors_seen.append(f"{name}: empty reply")
     raise AllProvidersFailed("; ".join(errors_seen) or "no LLM provider has a key")

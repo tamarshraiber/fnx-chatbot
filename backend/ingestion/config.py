@@ -12,6 +12,9 @@ DELAY_SECONDS = 1.5
 # Where the scraper saves one JSON file per page.
 RAW_DIR = Path("data/raw")
 
+# Where each refresh run saves its report of added / updated / removed pages.
+LOGS_DIR = Path("data/logs")
+
 # Where the chunker saves all chunks in one JSON file.
 CHUNKS_DIR = Path("data/chunks")
 

@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass, field
 
 from backend.config import (
@@ -13,6 +14,8 @@ from backend.config import (
 from backend.repositories import vector_repository
 from backend.services import rerank_service
 from backend.services.embedding_service import embed_question
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -48,7 +51,7 @@ def retrieve(
         try:
             return _retrieve_reranked(question, top_k, RERANK_THRESHOLD if threshold is None else threshold)
         except Exception as error:  # keep the chatbot working if Cohere is down or over its limit
-            print(f"Rerank failed ({type(error).__name__}). Using plain vector search.")
+            logger.warning(f"Rerank failed ({type(error).__name__}). Using plain vector search.")
 
     return _retrieve_vector(question, top_k, RELEVANCE_THRESHOLD if threshold is None else threshold)
 

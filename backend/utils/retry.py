@@ -1,3 +1,4 @@
+import logging
 import random
 import time
 from typing import Callable, TypeVar
@@ -6,6 +7,8 @@ import httpx
 from google.genai import errors
 
 from backend.config import RETRY_BASE_DELAY_SECONDS, RETRY_MAX_ATTEMPTS
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
@@ -32,5 +35,5 @@ def call_with_retry(function: Callable[[], T]) -> T:
             if code not in RETRYABLE_CODES or attempt == RETRY_MAX_ATTEMPTS:
                 raise  # not temporary, or we are out of attempts
             delay = RETRY_BASE_DELAY_SECONDS * 2 ** (attempt - 1) + random.uniform(0, 0.5)
-            print(f"LLM error {code}. Retry {attempt} of {RETRY_MAX_ATTEMPTS - 1} in {delay:.1f}s")
+            logger.warning(f"LLM error {code}. Retry {attempt} of {RETRY_MAX_ATTEMPTS - 1} in {delay:.1f}s")
             time.sleep(delay)
