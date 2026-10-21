@@ -58,7 +58,7 @@ export default function AccessibilityMenu() {
                 disabled={settings.textStep === 0}
                 aria-label="הקטנת הטקסט"
               >
-                א-
+                −
               </button>
               <span aria-live="polite" dir="ltr">{Math.round(TEXT_SCALES[settings.textStep] * 100)}%</span>
               <button
@@ -67,7 +67,7 @@ export default function AccessibilityMenu() {
                 disabled={settings.textStep === lastStep}
                 aria-label="הגדלת הטקסט"
               >
-                א+
+                +
               </button>
             </div>
           </div>
