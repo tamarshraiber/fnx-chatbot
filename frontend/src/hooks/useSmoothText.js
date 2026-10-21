@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { prefersReducedMotion } from "./reducedMotion";
 
 const BASE_CHARS_PER_SECOND = 45; // calm speed when we are keeping up with the server
 const EXTRA_PER_BACKLOG_CHAR = 3; // speed up a little for every character we are behind
@@ -14,7 +15,7 @@ export function useSmoothText(target, animate) {
   const [, setShown] = useState(position.current); // only used to ask React for a new render
 
   useEffect(() => {
-    if (!animate || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (!animate || prefersReducedMotion()) {
       position.current = target.length;
       setShown(target.length);
       return undefined;

@@ -1,0 +1,50 @@
+/* Settings from the accessibility menu. They are set on <html> as data-contrast and data-motion. */
+
+/* High contrast: black, white and yellow, strong borders, underlined links. These win over the dark-mode colors. */
+:root[data-contrast="high"] {
+  --bg: #000000;
+  --bg-glow: transparent;
+  --surface: #000000;
+  --surface-2: #1c1c1c;
+  --text: #ffffff;
+  --text-muted: #f0f0f0;
+  --border: #ffffff;
+  --brand: #ffe600;
+  --accent: #ffa64d;
+  --user-bg: #ffe600;
+  --user-text: #000000;
+  --warn-bg: #000000;
+  --warn-border: #ffe600;
+  --error-bg: #000000;
+  --error-border: #ff8a8a;
+  --error-text: #ffd0d0;
+  --focus: #00e5ff;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: 0 0 0 2px #ffffff;
+}
+:root[data-contrast="high"] a { text-decoration: underline; }
+:root[data-contrast="high"] .answer,
+:root[data-contrast="high"] .bubble,
+:root[data-contrast="high"] textarea,
+:root[data-contrast="high"] .a11y__panel,
+:root[data-contrast="high"] .stats__card,
+:root[data-contrast="high"] .ring,
+:root[data-contrast="high"] .stats__panel { outline: 2px solid var(--border); outline-offset: -2px; }
+:root[data-contrast="high"] .header__link { color: var(--accent); border-color: var(--accent); background: #000000; }
+
+/* Less motion: our own switch, in addition to the system setting that base.css already respects. */
+:root[data-motion="reduce"] *, :root[data-motion="reduce"] *::before, :root[data-motion="reduce"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* The word being read aloud (see hooks/readAlong.js). Background plus underline, so it does not depend on color alone. */
+::highlight(read-along) {
+  background-color: #ffd9b8;
+  color: #000000;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+:root[data-contrast="high"] ::highlight(read-along) { background-color: #ffe600; color: #000000; }

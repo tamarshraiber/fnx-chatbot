@@ -1,3 +1,4 @@
+import AccessibilityMenu from "./AccessibilityMenu";
 import Logo from "./Logo";
 import { CloseIcon, ExpandIcon, NewChatIcon, QualityIcon, ShrinkIcon } from "./Icons";
 import "./Header.css";
@@ -23,6 +24,7 @@ export default function Header({ mode, hasMessages, onNewChat, onToggleMode, onC
           <QualityIcon />
           <span className="header__link-text">איכות ושקיפות</span>
         </a>
+        <AccessibilityMenu />
         {hasMessages && (
           <button type="button" className="icon-btn" onClick={onNewChat} title="שיחה חדשה" aria-label="שיחה חדשה">
             <NewChatIcon />

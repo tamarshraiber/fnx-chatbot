@@ -16,10 +16,10 @@
   transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
 }
 .source:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); border-color: var(--accent); }
-.source__label { grid-area: label; font-size: 12px; font-weight: 500; color: var(--text-muted); }
+.source__label { grid-area: label; font-size: 0.75em; font-weight: 500; color: var(--text-muted); }
 .source__url {
   grid-area: url;
-  font-size: 13px;
+  font-size: 0.8125em;
   color: var(--brand);
   text-align: start;
   overflow: hidden;
@@ -27,6 +27,6 @@
   white-space: nowrap;
   min-width: 0;
 }
-.source__url--title { font-size: 14px; font-weight: 600; }
+.source__url--title { font-size: 0.875em; font-weight: 600; }
 .source__arrow { grid-area: arrow; color: var(--accent); display: grid; }
 .source__arrow svg { width: 18px; height: 18px; }

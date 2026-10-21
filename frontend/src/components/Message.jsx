@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
 import RichText from "./RichText";
 import SourceCard from "./SourceCard";
+import SpeakButton from "./SpeakButton";
 import { CheckIcon, CopyIcon } from "./Icons";
+import { useAccessibility } from "../hooks/useAccessibility";
 import { useSmoothText } from "../hooks/useSmoothText";
 import "./Message.css";
 
@@ -16,8 +18,10 @@ async function copyText(text) {
 }
 
 export default function Message({ message }) {
+  const { settings } = useAccessibility();
   const [copied, setCopied] = useState(false);
   const timer = useRef(null);
+  const textRef = useRef(null); // the answer text on the screen, for the read-aloud highlight
   useEffect(() => () => clearTimeout(timer.current), []);
 
   // Only a message that was streamed in front of the user is animated. Restored messages appear at once.
@@ -47,7 +51,9 @@ export default function Message({ message }) {
     <div className={`msg msg--bot ${animated.current ? "msg--soft" : ""}`}>
       <Logo size={32} />
       <div className={`answer ${message.found ? "" : "answer--notfound"} ${writing ? "answer--writing" : ""}`}>
-        <RichText text={text} />
+        <div ref={textRef}>
+          <RichText text={text} />
+        </div>
         {!writing && (
           <div className={appear}>
             {message.found && message.sourceUrl && <SourceCard url={message.sourceUrl} title={message.sourceTitle} />}
@@ -59,6 +65,7 @@ export default function Message({ message }) {
                 {copied ? <CheckIcon /> : <CopyIcon />}
                 <span aria-live="polite">{copied ? "הועתק" : "העתקה"}</span>
               </button>
+              <SpeakButton text={message.content} containerRef={textRef} autoPlay={settings.autoRead && animated.current && message.found} />
             </div>
           </div>
         )}

@@ -5,7 +5,7 @@ html, body, #root { height: 100%; }
 body {
   margin: 0;
   font-family: var(--font);
-  font-size: 16px;
+  font-size: calc(16px * var(--text-scale, 1)); /* the accessibility menu changes --text-scale */
   line-height: 1.6;
   color: var(--text);
   background: var(--bg);
