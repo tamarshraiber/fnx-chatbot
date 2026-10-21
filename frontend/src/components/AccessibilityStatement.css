@@ -1,0 +1,6 @@
+.statement section { margin-block-end: var(--space-5); }
+.statement h2 { margin: 0 0 var(--space-2); font-size: 1.125em; color: var(--brand); }
+.statement p, .statement li { line-height: 1.7; }
+.statement ul { margin: 0 0 var(--space-3); padding-inline-start: 1.4em; }
+.statement li { margin-block-end: var(--space-1); }
+.statement a { color: var(--brand); text-decoration: underline; }

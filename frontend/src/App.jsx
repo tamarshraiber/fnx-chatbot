@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import ChatWindow from "./components/ChatWindow";
 import Logo from "./components/Logo";
+import AccessibilityStatement from "./components/AccessibilityStatement";
 import StatsPage from "./components/StatsPage";
 import { ChatIcon, CloseIcon } from "./components/Icons";
 import { wakeServer } from "./api";
 import { useChat } from "./hooks/useChat";
 import "./App.css";
 
-const isStatsAddress = () => window.location.hash === "#/stats";
+const currentPage = () => window.location.hash; // "#/stats" and "#/accessibility" are the public pages
 
 export default function App() {
   const chat = useChat(); // lives here, so the conversation survives switching views
   const [mode, setMode] = useState("full"); // "full" | "widget"
   const [open, setOpen] = useState(true); // widget only: is the window open?
-  const [statsPage, setStatsPage] = useState(isStatsAddress); // the public quality page, at the address #/stats
+  const [page, setPage] = useState(currentPage);
 
   // A free server sleeps when unused. Waking it now means the first question does not wait for it.
   useEffect(() => {
@@ -21,7 +22,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const onChange = () => setStatsPage(isStatsAddress());
+    const onChange = () => setPage(currentPage());
     window.addEventListener("hashchange", onChange);
     return () => window.removeEventListener("hashchange", onChange);
   }, []);
@@ -31,7 +32,8 @@ export default function App() {
     setOpen(true);
   };
 
-  if (statsPage) return <StatsPage />;
+  if (page === "#/stats") return <StatsPage />;
+  if (page === "#/accessibility") return <AccessibilityStatement />;
 
   if (mode === "full") {
     return <ChatWindow mode="full" chat={chat} onToggleMode={toggleMode} />;

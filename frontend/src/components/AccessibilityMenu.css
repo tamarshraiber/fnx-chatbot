@@ -32,3 +32,4 @@
 .a11y__switch input { width: 22px; height: 22px; accent-color: var(--accent); cursor: pointer; }
 .a11y__reset { align-self: stretch; margin-top: var(--space-1); }
 .answer__voice-note { font-size: 0.8125em; color: var(--text-muted); }
+.a11y__statement { align-self: center; padding: 6px; color: var(--brand); text-decoration: underline; }

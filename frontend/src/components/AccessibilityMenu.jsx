@@ -87,6 +87,7 @@ export default function AccessibilityMenu() {
             </label>
           )}
           <button type="button" className="a11y__reset" onClick={reset}>איפוס ההגדרות</button>
+          <a className="a11y__statement" href="#/accessibility">הצהרת נגישות</a>
         </div>
       )}
     </div>
