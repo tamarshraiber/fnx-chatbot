@@ -87,7 +87,7 @@ def _finish_stream(text: str, chunks: list[dict]) -> ChatAnswer:
         return _not_on_website()
 
     titles_by_url = {chunk["url"]: chunk.get("title", "") for chunk in chunks}
-    url = text[index + len(SOURCE_MARKER):].strip().strip("<>()[]\"'`*").rstrip(".,") if index >= 0 else ""
+    url = text[index + len(SOURCE_MARKER):].strip().strip("<>()[]\"'`*.,") if index >= 0 else ""
     # The words are already on screen, so a missing or wrong URL only means: no source card.
     if url not in titles_by_url:
         return ChatAnswer(answer=answer, source_url=None, found=True)
