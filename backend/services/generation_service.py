@@ -3,6 +3,7 @@ from typing import Iterator
 
 from backend.models.schemas import ChatAnswer, LLMAnswer
 from backend.services.llm_service import generate_json, stream_text
+from backend.utils.spelling import fix_spelling
 
 NOT_ON_WEBSITE = "מידע זה אינו מופיע באתר. מומלץ לפנות לשירות הלקוחות של הפניקס."
 
@@ -76,7 +77,7 @@ def generate_answer(question: str, chunks: list[dict]) -> ChatAnswer:
         return _not_on_website()
 
     return ChatAnswer(
-        answer=result.answer.strip(),
+        answer=fix_spelling(result.answer.strip()),
         source_url=result.source_url,
         found=True,
         source_title=_clean_title(titles_by_url[result.source_url]),
@@ -86,7 +87,7 @@ def generate_answer(question: str, chunks: list[dict]) -> ChatAnswer:
 def _finish_stream(text: str, chunks: list[dict]) -> ChatAnswer:
     """Build the final answer from the whole streamed text: split off the SOURCE line and check the URL."""
     index = text.rfind(SOURCE_MARKER)
-    answer = (text if index < 0 else text[:index]).strip()
+    answer = fix_spelling((text if index < 0 else text[:index]).strip())  # the final answer replaces the streamed words
     if not answer:
         return _not_on_website()
 
