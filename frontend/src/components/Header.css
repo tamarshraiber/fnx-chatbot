@@ -48,7 +48,7 @@
   background: var(--warn-bg);
   font-size: 13px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
   animation: header-glow 2.4s ease-out 1s 1;
   transition: transform 0.15s, box-shadow 0.15s;

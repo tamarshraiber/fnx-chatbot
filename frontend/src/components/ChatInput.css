@@ -41,7 +41,7 @@
   width: 44px; height: 44px;
   border: 0;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--orange-500), var(--orange-400));
+  background: linear-gradient(135deg, var(--accent-solid), var(--accent-solid-2));
   color: #fff;
   box-shadow: 0 4px 12px rgba(242, 106, 33, 0.4);
   transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
@@ -94,8 +94,8 @@
 .input__mic:hover { background: var(--surface-2); color: var(--text); }
 .input__mic--on {
   border-color: var(--accent);
-  background: var(--orange-100);
-  color: var(--orange-500);
+  background: var(--warn-bg);
+  color: var(--accent-text);
   animation: mic-pulse 1.4s ease-out infinite;
 }
 .input__error { margin: 8px 0 0; text-align: center; font-size: 0.875em; color: var(--error-text); }

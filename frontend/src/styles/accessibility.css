@@ -11,6 +11,7 @@
   --border: #ffffff;
   --brand: #ffe600;
   --accent: #ffa64d;
+  --accent-text: #ffa64d;
   --user-bg: #ffe600;
   --user-text: #000000;
   --warn-bg: #000000;
@@ -63,3 +64,6 @@
   font-weight: 700;
 }
 .skip-link:focus { top: 8px; }
+
+/* High contrast: buttons that are orange with white text become yellow with black text. */
+:root[data-contrast="high"] .input__send { background: #ffe600; color: #000000; box-shadow: none; }

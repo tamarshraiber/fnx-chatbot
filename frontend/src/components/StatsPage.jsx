@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Logo from "./Logo";
+import { ChatIcon } from "./Icons";
 import AccuracyRing, { percentOf } from "./AccuracyRing";
 import { fetchStats } from "../api";
 import { useCountUp } from "../hooks/useCountUp";
@@ -108,10 +109,10 @@ export default function StatsPage() {
       <header className="stats__header">
         <Logo size={40} />
         <div>
-          <h1>איכות ושקיפות</h1>
+          <h1>מדד האמינות</h1>
           <p>נתונים כלליים בלבד. אין כאן שאלות או מידע על משתמשים.</p>
         </div>
-        <a className="stats__back" href="#/">חזרה לצ'אט</a>
+        <a className="stats__back" href="#/"><ChatIcon />חזרה לצ'אט</a>
       </header>
 
       {failed && <p className="stats__error">לא הצלחנו לטעון את הנתונים. נסו שוב בעוד רגע.</p>}
@@ -167,6 +168,7 @@ export default function StatsPage() {
           </p>
         </>
       )}
+      <p className="stats__foot"><a href="#/accessibility">הצהרת נגישות</a></p>
     </main>
   );
 }

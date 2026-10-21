@@ -15,7 +15,10 @@
   --text: #0e1a33;
   --text-muted: #5a6784;
   --border: #dde4f0;
-  --accent: var(--orange-500);
+  --accent: var(--orange-500); /* decoration: borders, glows, icons */
+  --accent-text: #c2410c; /* orange used as TEXT: 5.2 to 1 on white (the bright orange only reaches 3 to 1) */
+  --accent-solid: #c2410c; /* buttons that carry white text */
+  --accent-solid-2: #cf4a12; /* the other end of such a button's gradient (white on it: 4.5 to 1) */
   --brand: var(--navy-800);
   --user-bg: linear-gradient(135deg, var(--navy-800), var(--navy-700));
   --user-text: #ffffff;
@@ -52,6 +55,7 @@
     --text-muted: #9aa8c6;
     --border: #25365e;
     --brand: #9db8f2;
+    --accent-text: #ff8a4c; /* bright orange is easy to read on the dark surface: 7 to 1 */
     --user-bg: linear-gradient(135deg, #1b3a78, #254a94);
     --warn-bg: #2a1d14;
     --warn-border: #5a3a22;

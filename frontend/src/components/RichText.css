@@ -10,4 +10,4 @@
   text-underline-offset: 3px;
   unicode-bidi: isolate; /* a URL inside Hebrew text keeps its own direction */
 }
-.rich a:hover { color: var(--accent); }
+.rich a:hover { color: var(--accent-text); }

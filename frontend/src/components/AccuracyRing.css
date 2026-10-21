@@ -17,7 +17,7 @@
 .ring__track { fill: none; stroke: var(--surface-2); stroke-width: 10; }
 .ring__fill {
   fill: none;
-  stroke: var(--accent);
+  stroke: var(--accent-text);
   stroke-width: 10;
   stroke-linecap: round;
   stroke-dashoffset: var(--ring-offset);

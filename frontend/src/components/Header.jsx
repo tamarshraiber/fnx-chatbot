@@ -18,11 +18,11 @@ export default function Header({ mode, hasMessages, onNewChat, onToggleMode, onC
         <a
           className={`header__link${widget ? " header__link--compact" : ""}`}
           href="#/stats"
-          title="איכות ושקיפות"
-          aria-label="איכות ושקיפות"
+          title="מדד האמינות"
+          aria-label="מדד האמינות"
         >
           <QualityIcon />
-          <span className="header__link-text">איכות ושקיפות</span>
+          <span className="header__link-text">מדד האמינות</span>
         </a>
         <AccessibilityMenu />
         {hasMessages && (
