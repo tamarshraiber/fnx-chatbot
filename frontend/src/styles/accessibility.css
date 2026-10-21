@@ -48,3 +48,18 @@
   text-decoration-thickness: 2px;
 }
 :root[data-contrast="high"] ::highlight(read-along) { background-color: #ffe600; color: #000000; }
+
+/* "Skip to the question box": hidden until a keyboard user reaches it with Tab. */
+.skip-link {
+  position: fixed;
+  inset-inline-start: 8px;
+  top: -80px;
+  z-index: 100;
+  padding: 10px 16px;
+  border: 2px solid var(--brand);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--brand);
+  font-weight: 700;
+}
+.skip-link:focus { top: 8px; }

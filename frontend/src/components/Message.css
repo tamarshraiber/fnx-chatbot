@@ -80,3 +80,14 @@
 }
 .copy:hover { background: var(--surface-2); color: var(--text); }
 .copy svg { width: 16px; height: 16px; }
+
+/* The piece of an earlier answer that this question is about */
+.bubble__quote {
+  margin-bottom: 6px;
+  padding: 4px 10px;
+  border-inline-start: 3px solid currentColor;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.875em;
+  opacity: 0.9;
+}

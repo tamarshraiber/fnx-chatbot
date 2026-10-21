@@ -34,7 +34,10 @@ export default function Message({ message }) {
   if (message.role === "user") {
     return (
       <div className="msg msg--user">
-        <div className="bubble" dir="auto">{message.content}</div>
+        <div className="bubble" dir="auto">
+          {message.quote && <div className="bubble__quote">«{message.quote}»</div>}
+          {message.content}
+        </div>
       </div>
     );
   }

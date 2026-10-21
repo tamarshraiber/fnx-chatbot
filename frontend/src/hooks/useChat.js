@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { ChatError, streamChat } from "../api";
+import { composeQuestion } from "./quote";
 
 const STORAGE_KEY = "phoenix-chat-messages";
 
@@ -85,12 +86,16 @@ export function useChat() {
   }, []);
 
   const send = useCallback(
-    (text) => {
+    (text, quote) => {
       const question = text.trim();
       if (!question || loading) return;
-      const history = messagesRef.current.map(({ role, content }) => ({ role, content }));
-      update([...messagesRef.current, { id: nextId++, role: "user", content: question }]);
-      run(question, history);
+      // A quoted piece of an earlier answer travels with the question (and with the history), but is shown apart.
+      const history = messagesRef.current.map(({ role, content, quote: quoted }) => ({
+        role,
+        content: quoted ? composeQuestion(content, quoted) : content,
+      }));
+      update([...messagesRef.current, { id: nextId++, role: "user", content: question, ...(quote ? { quote } : {}) }]);
+      run(composeQuestion(question, quote), history);
     },
     [loading, run],
   );

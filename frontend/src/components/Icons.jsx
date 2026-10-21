@@ -26,4 +26,5 @@ export const QualityIcon = () => (<svg {...base}><path d="M12 3 5 6v5c0 4.4 2.9 
 export const AccessibilityIcon = () => (<svg {...base}><circle cx="12" cy="4.5" r="1.8" /><path d="M5 8.5c4.5 1.4 9.5 1.4 14 0" /><path d="M12 8.5v5" /><path d="m8.5 20 3.5-6.5 3.5 6.5" /></svg>);
 export const SpeakerIcon = () => (<svg {...base}><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4Z" /><path d="M15.5 9a4 4 0 0 1 0 6" /><path d="M18 6.5a7.5 7.5 0 0 1 0 11" /></svg>);
 export const StopIcon = () => (<svg {...base}><rect x="6" y="6" width="12" height="12" rx="2" /></svg>);
+export const MicIcon = () => (<svg {...base}><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0" /><path d="M12 17.5V21" /><path d="M9 21h6" /></svg>);
 export const RetryIcon = () => (<svg {...base}><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 4v7h-7" /></svg>);
