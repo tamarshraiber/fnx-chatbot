@@ -1,1 +1,20 @@
-.logo { display: block; flex: none; border-radius: 50%; filter: drop-shadow(0 2px 4px rgba(11, 27, 59, 0.3)); }
+.logo { display: block; flex: none; overflow: visible; filter: drop-shadow(0 2px 3px rgba(11, 27, 59, 0.28)); }
+
+/* while the bot is writing, the sparkle twinkles and its dot blinks */
+.logo--thinking .logo__spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: logo-twinkle 1.3s ease-in-out infinite;
+}
+.logo--thinking .logo__dot { animation: logo-blink 1.3s ease-in-out infinite; }
+@keyframes logo-twinkle {
+  0%, 100% { transform: scale(1) rotate(0); opacity: 1; }
+  50% { transform: scale(0.65) rotate(45deg); opacity: 0.65; }
+}
+@keyframes logo-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo--thinking .logo__spark, .logo--thinking .logo__dot { animation: none; }
+}

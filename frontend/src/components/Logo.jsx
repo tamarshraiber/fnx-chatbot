@@ -1,38 +1,55 @@
 import { useId } from "react";
 import "./Logo.css";
 
-/** Profile icon: a soft navy circle with a fire-colored Hebrew letter ה (He). */
-export default function Logo({ size = 40 }) {
-  const id = useId(); // gradient ids must be unique, since the logo appears several times on one page
+/**
+ * Two speech bubbles that merge into one symbol: a navy one behind, an orange one in front, and a lighter
+ * shape where they overlap. A small sparkle in the orange bubble hints at "smart". With thinking=true the
+ * sparkle twinkles (used while the bot is writing an answer).
+ */
+export default function Logo({ size = 40, thinking = false }) {
+  const id = useId(); // gradient and clip ids must be unique, since the logo appears several times on one page
   const navy = `${id}-navy`;
   const fire = `${id}-fire`;
+  const back = `${id}-back`;
   return (
-    <svg className="logo" width={size} height={size} viewBox="0 0 64 64" role="img" aria-label="הפניקס">
+    <svg
+      className={`logo${thinking ? " logo--thinking" : ""}`}
+      width={size}
+      height={size}
+      viewBox="0 0 64 64"
+      role="img"
+      aria-label="עוזר וירטואלי"
+    >
       <defs>
         <linearGradient id={navy} x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#0b1b3b" />
-          <stop offset="1" stopColor="#1f4a9c" />
+          <stop offset="0" stopColor="#1b3a78" />
+          <stop offset="1" stopColor="#2f66c8" />
         </linearGradient>
-        <linearGradient id={fire} gradientUnits="userSpaceOnUse" x1="0" y1="44" x2="0" y2="20">
-          <stop offset="0" stopColor="#f58a4b" />
-          <stop offset="1" stopColor="#ffc89a" />
+        <linearGradient id={fire} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stopColor="#f26a21" />
+          <stop offset="1" stopColor="#ff8a4c" />
         </linearGradient>
+        <clipPath id={back}>
+          <rect x="5" y="7" width="35" height="29" rx="10" />
+        </clipPath>
       </defs>
-      {/* round background with a faint ring */}
-      <circle cx="32" cy="32" r="31" fill={`url(#${navy})`} />
-      <circle cx="32" cy="32" r="30" fill="none" stroke="#f58a4b" strokeOpacity="0.35" strokeWidth="1" />
-      {/* the letter He, sitting on the baseline. On screen it looked too low at y=44, so it is moved up */}
-      <text
-        x="32"
-        y="41"
-        textAnchor="middle"
-        fontFamily="'Arial Hebrew', Arial, 'Segoe UI', sans-serif"
-        fontSize="34"
-        fontWeight="700"
-        fill={`url(#${fire})`}
-      >
-        ה
-      </text>
+      {/* back bubble (navy), tail at the bottom left */}
+      <path d="M12 35 L10 46 L22 35 Z" fill={`url(#${navy})`} />
+      <rect x="5" y="7" width="35" height="29" rx="10" fill={`url(#${navy})`} stroke="#ffffff" strokeOpacity="0.22" strokeWidth="1" />
+      {/* front bubble (orange), tail at the bottom right */}
+      <path d="M51 49 L55 59 L43 49 Z" fill={`url(#${fire})`} />
+      <rect x="22" y="21" width="37" height="29" rx="10" fill={`url(#${fire})`} />
+      {/* where the two bubbles meet: the lighter overlap that joins them into one symbol */}
+      <g clipPath={`url(#${back})`}>
+        <rect x="22" y="21" width="37" height="29" rx="10" fill="#ffe3d0" fillOpacity="0.92" />
+      </g>
+      {/* the sparkle and its dot: the "AI" hint */}
+      <path
+        className="logo__spark"
+        d="M48 29 Q48 35.5 54.5 35.5 Q48 35.5 48 42 Q48 35.5 41.5 35.5 Q48 35.5 48 29 Z"
+        fill="#ffffff"
+      />
+      <circle className="logo__dot" cx="54.5" cy="28.5" r="1.7" fill="#ffffff" />
     </svg>
   );
 }

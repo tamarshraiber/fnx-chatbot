@@ -1,15 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
     <linearGradient id="navy" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#0b1b3b" />
-      <stop offset="1" stop-color="#1f4a9c" />
+      <stop offset="0" stop-color="#1b3a78" />
+      <stop offset="1" stop-color="#2f66c8" />
     </linearGradient>
-    <linearGradient id="fire" gradientUnits="userSpaceOnUse" x1="0" y1="44" x2="0" y2="20">
-      <stop offset="0" stop-color="#f58a4b" />
-      <stop offset="1" stop-color="#ffc89a" />
+    <linearGradient id="fire" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#f26a21" />
+      <stop offset="1" stop-color="#ff8a4c" />
     </linearGradient>
+    <clipPath id="back"><rect x="5" y="7" width="35" height="29" rx="10" /></clipPath>
   </defs>
-  <circle cx="32" cy="32" r="31" fill="url(#navy)" />
-  <circle cx="32" cy="32" r="30" fill="none" stroke="#f58a4b" stroke-opacity="0.35" stroke-width="1" />
-  <text x="32" y="41" text-anchor="middle" font-family="'Arial Hebrew', Arial, 'Segoe UI', sans-serif" font-size="34" font-weight="700" fill="url(#fire)">ה</text>
+  <path d="M12 35 L10 46 L22 35 Z" fill="url(#navy)" />
+  <rect x="5" y="7" width="35" height="29" rx="10" fill="url(#navy)" />
+  <path d="M51 49 L55 59 L43 49 Z" fill="url(#fire)" />
+  <rect x="22" y="21" width="37" height="29" rx="10" fill="url(#fire)" />
+  <g clip-path="url(#back)"><rect x="22" y="21" width="37" height="29" rx="10" fill="#ffe3d0" fill-opacity="0.92" /></g>
+  <path d="M48 29 Q48 35.5 54.5 35.5 Q48 35.5 48 42 Q48 35.5 41.5 35.5 Q48 35.5 48 29 Z" fill="#ffffff" />
+  <circle cx="54.5" cy="28.5" r="1.7" fill="#ffffff" />
 </svg>
