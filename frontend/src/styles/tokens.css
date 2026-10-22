@@ -8,10 +8,11 @@
   --orange-400: #ff8a4c;
   --orange-100: #fff0e6;
 
-  --bg: #f4f6fb;
+  --bg: #faf7f1; /* warm ivory paper */
+  --bg-sky: #e6eefb; /* pale morning sky, fades into the ivory */
   --bg-glow: rgba(242, 106, 33, 0.09);
   --surface: #ffffff;
-  --surface-2: #eef2f9;
+  --surface-2: #f3efe7;
   --text: #0e1a33;
   --text-muted: #5a6784;
   --border: #dde4f0;
@@ -48,6 +49,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #070f24;
+    --bg-sky: #0d1d42;
     --bg-glow: rgba(242, 106, 33, 0.1);
     --surface: #101c38;
     --surface-2: #17264a;

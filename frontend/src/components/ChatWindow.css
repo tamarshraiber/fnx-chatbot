@@ -14,13 +14,10 @@
 }
 .chat__footer { padding: var(--space-3) var(--space-5) var(--space-4); }
 
-/* Full page: fills the screen, with a soft warm glow behind the content */
+/* Full page: fills the screen, pale sky at the top fading into warm paper */
 .chat--full {
   height: 100dvh;
-  background:
-    radial-gradient(900px 420px at 85% -10%, var(--bg-glow), transparent),
-    radial-gradient(700px 400px at 5% 0%, rgba(27, 58, 120, 0.08), transparent),
-    var(--bg);
+  background: linear-gradient(180deg, var(--bg-sky) 0%, var(--bg) 55%);
 }
 
 /* Widget: a floating window in the bottom corner */

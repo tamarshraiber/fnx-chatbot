@@ -3,9 +3,10 @@
 /* High contrast: black, white and yellow, strong borders, underlined links. These win over the dark-mode colors. */
 :root[data-contrast="high"] {
   --bg: #000000;
+  --bg-sky: #000000;
   --bg-glow: transparent;
   --surface: #000000;
-  --surface-2: #1c1c1c;
+  --surface-2: #000000;
   --text: #ffffff;
   --text-muted: #f0f0f0;
   --border: #ffffff;

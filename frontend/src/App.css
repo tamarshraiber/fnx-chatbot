@@ -3,9 +3,7 @@
   display: grid;
   place-items: center;
   padding: var(--space-5);
-  background:
-    radial-gradient(800px 400px at 80% 0%, var(--bg-glow), transparent),
-    var(--bg);
+  background: linear-gradient(180deg, var(--bg-sky) 0%, var(--bg) 60%);
 }
 .stage__intro { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); text-align: center; }
 .stage__intro h1 { margin: 0; font-size: 28px; color: var(--brand); }
