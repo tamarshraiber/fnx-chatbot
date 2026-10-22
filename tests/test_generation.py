@@ -132,19 +132,27 @@ def test_stream_not_found_with_leading_whitespace(monkeypatch):
     assert final["found"] is False
 
 
-def test_stream_wrong_url_keeps_the_answer_without_a_source(monkeypatch):
+def test_stream_wrong_url_still_gets_a_source(monkeypatch):
     fake_stream(monkeypatch, ["תשובה.\nSOURCE: https://example.com/other"])
     _, final = run_stream()
-    assert final["found"] is True and final["answer"] == "תשובה." and final["source_url"] is None
+    assert final["found"] is True and final["answer"] == "תשובה." and final["source_url"] == URL
 
 
-def test_stream_missing_source_line_keeps_the_answer(monkeypatch):
+def test_stream_missing_source_line_still_gets_a_source(monkeypatch):
     fake_stream(monkeypatch, ["תשובה בלי מקור, ארוכה מספיק."])
     text, final = run_stream()
-    assert final["found"] is True and final["source_url"] is None
+    assert final["found"] is True and final["source_url"] == URL and final["source_title"] == "ביטוח בריאות"
     # The last few characters are held back (they could be the start of "SOURCE:"). The page replaces the
     # streamed text with the final answer, so the streamed text only has to be the start of it.
     assert final["answer"].startswith(text) and len(text) > 0
+
+
+def test_stream_missing_source_picks_the_chunk_the_answer_matches(monkeypatch):
+    other = "https://www.fnx.co.il/b"
+    chunks = [make_chunk(url=URL, text="ביטוח דירה מכסה שריפה"), make_chunk(url=other, text="תביעה מוגשת באתר או בטלפון")]
+    monkeypatch.setattr(gen, "stream_text", lambda system_prompt, prompt: iter(["אפשר להגיש תביעה באתר או בטלפון, בקלות."]))
+    final = list(gen.stream_answer("איך מגישים תביעה?", chunks))[-1]
+    assert final["source_url"] == other
 
 
 def test_stream_url_with_decoration_is_accepted(monkeypatch):

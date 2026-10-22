@@ -86,6 +86,12 @@ def generate_answer(question: str, chunks: list[dict]) -> ChatAnswer:
     )
 
 
+def _best_source(answer: str, chunks: list[dict]) -> str:
+    """The retrieved chunk whose words overlap the answer most (the first one, the best match, on a tie)."""
+    words = set(re.findall(r"\w+", answer))
+    return max(chunks, key=lambda chunk: len(words & set(re.findall(r"\w+", chunk["text"]))))["url"]
+
+
 def _finish_stream(text: str, chunks: list[dict]) -> ChatAnswer:
     """Build the final answer from the whole streamed text: split off the SOURCE line and check the URL."""
     index = text.rfind(SOURCE_MARKER)
@@ -95,9 +101,10 @@ def _finish_stream(text: str, chunks: list[dict]) -> ChatAnswer:
 
     titles_by_url = {chunk["url"]: chunk.get("title", "") for chunk in chunks}
     url = text[index + len(SOURCE_MARKER):].strip().strip("<>()[]\"'`*.,") if index >= 0 else ""
-    # The words are already on screen, so a missing or wrong URL only means: no source card.
+    # The words are already on screen. If the model left out the URL or wrote one we did not retrieve (backup models
+    # do this more often), we still show a source: the retrieved page that the answer matches best.
     if url not in titles_by_url:
-        return ChatAnswer(answer=answer, source_url=None, found=True)
+        url = _best_source(answer, chunks)
     return ChatAnswer(answer=answer, source_url=url, found=True, source_title=_clean_title(titles_by_url[url]))
 
 
