@@ -1,3 +1,4 @@
+import AccessibilityMenu from "./AccessibilityMenu";
 import Logo from "./Logo";
 import { ChatIcon } from "./Icons";
 import "./StatsPage.css";
@@ -15,6 +16,7 @@ export default function AccessibilityStatement() {
           <h1>הצהרת נגישות</h1>
           <p>העוזר הווירטואלי של הפניקס. עודכן ב-21.10.2026.</p>
         </div>
+        <AccessibilityMenu />
         <a className="stats__back" href="#/"><ChatIcon />חזרה לצ'אט</a>
       </header>
 

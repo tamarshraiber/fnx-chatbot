@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import AccessibilityMenu from "./AccessibilityMenu";
 import Logo from "./Logo";
 import { ChatIcon } from "./Icons";
 import AccuracyRing, { percentOf } from "./AccuracyRing";
@@ -112,6 +113,7 @@ export default function StatsPage() {
           <h1>מדד האמינות</h1>
           <p>נתונים כלליים בלבד. אין כאן שאלות או מידע על משתמשים.</p>
         </div>
+        <AccessibilityMenu />
         <a className="stats__back" href="#/"><ChatIcon />חזרה לצ'אט</a>
       </header>
 
