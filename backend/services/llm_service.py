@@ -12,6 +12,7 @@ from backend.config import (
     GEMINI_API_KEY,
     GEMINI_API_KEY_2,
     GEMINI_MODEL,
+    GEMINI_THINKING_BUDGET,
     GEMINI_TIMEOUT_SECONDS,
     GROQ_API_KEY,
     GROQ_MODEL,
@@ -52,9 +53,17 @@ def _get_gemini_client(api_key: str) -> genai.Client:
     return _gemini_clients[api_key]
 
 
+def _gemini_config(system_prompt: str) -> types.GenerateContentConfig:
+    return types.GenerateContentConfig(
+        system_instruction=system_prompt,
+        temperature=0.0,
+        thinking_config=types.ThinkingConfig(thinking_budget=GEMINI_THINKING_BUDGET),
+    )
+
+
 def _call_gemini(system_prompt: str, prompt: str, schema: type[BaseModel] | None, api_key: str = "") -> str:
     client = _get_gemini_client(api_key or GEMINI_API_KEY)
-    config = types.GenerateContentConfig(system_instruction=system_prompt, temperature=0.0)
+    config = _gemini_config(system_prompt)
     if schema is not None:
         config.response_mime_type = "application/json"
         config.response_schema = schema
@@ -151,7 +160,7 @@ def _generate(system_prompt: str, prompt: str, schema: type[M] | None) -> str | 
 # No retry here: before the first piece arrives, a failure just moves on to the next provider.
 
 def _stream_gemini(system_prompt: str, prompt: str, api_key: str = "") -> Iterator[str]:
-    config = types.GenerateContentConfig(system_instruction=system_prompt, temperature=0.0)
+    config = _gemini_config(system_prompt)
     for chunk in _get_gemini_client(api_key or GEMINI_API_KEY).models.generate_content_stream(model=GEMINI_MODEL, contents=prompt, config=config):
         if chunk.text:
             yield chunk.text

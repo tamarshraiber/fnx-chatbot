@@ -78,7 +78,10 @@ LLM_COOLDOWN_SECONDS = float(os.getenv("LLM_COOLDOWN_SECONDS", "60"))
 LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "30"))
 # Gemini normally answers in about 1 second, but it once hung for 2 minutes. After this many seconds without
 # a reply we count it as failed and move on to the next provider.
-GEMINI_TIMEOUT_SECONDS = float(os.getenv("GEMINI_TIMEOUT_SECONDS", "10"))
+GEMINI_TIMEOUT_SECONDS = float(os.getenv("GEMINI_TIMEOUT_SECONDS", "10"))  # Google rejects anything under 10
+# Gemini "thinks" before it answers, which took about 5 seconds for a one-line reply. The answers come from the
+# retrieved site text, so we do not need it. 0 = no thinking. Set GEMINI_THINKING_BUDGET=-1 to let the model decide.
+GEMINI_THINKING_BUDGET = int(os.getenv("GEMINI_THINKING_BUDGET", "0"))
 
 
 # Answer cache: the same question (after the follow-up rewrite) gets the stored answer at once, with no search and
