@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { StrictMode } from "react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AccessibilityMenu from "./AccessibilityMenu";
 import SpeakButton from "./SpeakButton";
@@ -41,11 +42,19 @@ describe("SpeakButton", () => {
     expect(screen.getByRole("status").textContent).toContain("לא נמצא קול בעברית");
   });
 
-  it("reads by itself only when auto-play is on", () => {
+  it("reads by itself only when auto-play is on", async () => {
     const { rerender } = render(<SpeakButton text="שלום" />);
     expect(synth.speak).not.toHaveBeenCalled();
     rerender(<SpeakButton text="שלום" autoPlay />);
-    expect(synth.speak).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(synth.speak).toHaveBeenCalledTimes(1));
+  });
+
+  it("auto-play is not cancelled by React's double setup in development (StrictMode)", async () => {
+    render(<StrictMode><SpeakButton text="שלום" autoPlay /></StrictMode>);
+    await waitFor(() => expect(synth.speak).toHaveBeenCalledTimes(1));
+    const speakOrder = synth.speak.mock.invocationCallOrder[0];
+    const cancelsAfter = synth.cancel.mock.invocationCallOrder.filter((order) => order > speakOrder);
+    expect(cancelsAfter).toHaveLength(0);
   });
 
   it("shows no button when the browser cannot speak", () => {

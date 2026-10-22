@@ -23,11 +23,15 @@ export default function SpeakButton({ text, containerRef, autoPlay = false }) {
     }
   }, [containerRef, speak, text]);
 
+  // The start waits one tick. In development, React sets up and cleans up every component twice, and the cleanup
+  // in useSpeech cancels speech: without the wait, the first start would be cancelled and never repeated.
   useEffect(() => {
-    if (autoPlay && !autoPlayed.current) {
+    if (!autoPlay || autoPlayed.current) return undefined;
+    const timer = setTimeout(() => {
       autoPlayed.current = true;
       play();
-    }
+    }, 0);
+    return () => clearTimeout(timer);
   }, [autoPlay, play]);
 
   useEffect(() => {
