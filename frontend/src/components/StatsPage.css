@@ -10,7 +10,7 @@
   gap: var(--space-3);
   margin-block-end: var(--space-5);
 }
-.stats__header > div { flex: 1; }
+.stats__header > div:not(.a11y) { flex: 1; } /* the title takes the free space; the accessibility button stays small, next to "back" */
 .stats__header h1 { margin: 0; font-size: calc(22px * var(--text-scale, 1)); color: var(--brand); }
 .stats__header p { margin: 0; font-size: calc(14px * var(--text-scale, 1)); color: var(--text-muted); }
 .stats__back {
