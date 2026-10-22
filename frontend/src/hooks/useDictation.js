@@ -26,7 +26,7 @@ export function dictationErrorMessage(code) {
 /**
  * Turn speech into text with the browser's own recognition (Hebrew). No server of ours is involved.
  * onText(text) is called while the person talks, with everything said in this recording so far.
- * Returns { supported, listening, error, start(), stop() }.
+ * Returns { supported, listening, error, start(), stop(), cancel() }.
  */
 export function useDictation(onText) {
   const supported = dictationSupported();
@@ -38,6 +38,17 @@ export function useDictation(onText) {
 
   const stop = useCallback(() => {
     recognition.current?.stop();
+  }, []);
+
+  // stop() lets the browser deliver one last piece of text after it. cancel() throws that away: used when the question is sent.
+  const cancel = useCallback(() => {
+    const rec = recognition.current;
+    if (!rec) return;
+    rec.onresult = null;
+    rec.onerror = null;
+    recognition.current = null;
+    setListening(false);
+    rec.abort?.();
   }, []);
 
   const start = useCallback(() => {
@@ -71,5 +82,5 @@ export function useDictation(onText) {
 
   useEffect(() => () => recognition.current?.abort?.(), []);
 
-  return { supported, listening, error, start, stop };
+  return { supported, listening, error, start, stop, cancel };
 }

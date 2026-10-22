@@ -37,7 +37,7 @@ export default function ChatInput({ onSend, loading, quote = "", onClearQuote })
 
   const submit = () => {
     if (!value.trim() || loading) return;
-    dictation.stop();
+    dictation.cancel(); // not stop(): a late piece of the recording would put the sent text back in the box
     onSend(value);
     setValue("");
   };

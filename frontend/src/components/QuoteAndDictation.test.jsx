@@ -129,6 +129,23 @@ describe("dictation", () => {
     expect(screen.getByRole("button", { name: "הקלטת שאלה בקול" })).toBeTruthy();
   });
 
+  it("empties the box after sending, even if the recording delivers one more piece of text", () => {
+    const onSend = vi.fn();
+    render(<ChatInput onSend={onSend} loading={false} />);
+    const box = screen.getByLabelText("השאלה שלכם");
+    fireEvent.click(screen.getByRole("button", { name: "הקלטת שאלה בקול" }));
+    const late = recognition.onresult; // what the browser would still call after the send
+    act(() => late({ results: [[{ transcript: "מה כולל ביטוח" }]] }));
+    expect(box.value).toBe("מה כולל ביטוח");
+
+    fireEvent.click(screen.getByRole("button", { name: "שליחה" }));
+    expect(onSend).toHaveBeenCalledWith("מה כולל ביטוח");
+    expect(box.value).toBe("");
+    expect(recognition.abort).toHaveBeenCalled();
+    expect(recognition.onresult).toBeNull(); // a late piece of text is ignored
+    expect(screen.getByRole("button", { name: "הקלטת שאלה בקול" })).toBeTruthy();
+  });
+
   it("explains in Hebrew when the microphone is not allowed", () => {
     render(<ChatInput onSend={() => {}} loading={false} />);
     fireEvent.click(screen.getByRole("button", { name: "הקלטת שאלה בקול" }));
