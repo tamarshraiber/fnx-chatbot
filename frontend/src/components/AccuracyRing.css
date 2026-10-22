@@ -28,14 +28,14 @@
   position: absolute;
   top: calc(var(--space-4) + 65px);
   transform: translateY(-50%);
-  font-size: 26px;
+  font-size: calc(26px * var(--text-scale, 1));
   font-weight: 700;
   color: var(--brand);
 }
 .ring__caption { display: flex; flex-direction: column; gap: 2px; margin-block-start: var(--space-2); }
-.ring__score { font-size: 14px; color: var(--text-muted); }
+.ring__score { font-size: calc(14px * var(--text-scale, 1)); color: var(--text-muted); }
 .ring__label { font-weight: 600; }
-.ring__note { font-size: 13px; color: var(--text-muted); }
+.ring__note { font-size: calc(13px * var(--text-scale, 1)); color: var(--text-muted); }
 .ring__explain {
   margin-block-start: var(--space-2);
   padding-block-start: var(--space-2);

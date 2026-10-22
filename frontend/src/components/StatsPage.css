@@ -11,8 +11,8 @@
   margin-block-end: var(--space-5);
 }
 .stats__header > div { flex: 1; }
-.stats__header h1 { margin: 0; font-size: 22px; color: var(--brand); }
-.stats__header p { margin: 0; font-size: 14px; color: var(--text-muted); }
+.stats__header h1 { margin: 0; font-size: calc(22px * var(--text-scale, 1)); color: var(--brand); }
+.stats__header p { margin: 0; font-size: calc(14px * var(--text-scale, 1)); color: var(--text-muted); }
 .stats__back {
   display: inline-flex;
   align-items: center;
@@ -43,10 +43,10 @@
   animation: stats-rise 0.6s ease-out both;
   animation-delay: calc(var(--i, 0) * 120ms);
 }
-.stats__value { font-size: 32px; font-weight: 700; color: var(--brand); text-align: center; }
+.stats__value { font-size: calc(32px * var(--text-scale, 1)); font-weight: 700; color: var(--brand); text-align: center; }
 .stats__label { margin-block-start: 4px; font-weight: 600; }
-.stats__note { margin-block-start: 4px; font-size: 13px; color: var(--text-muted); }
-.stats__foot, .stats__loading, .stats__error { font-size: 14px; color: var(--text-muted); }
+.stats__note { margin-block-start: 4px; font-size: calc(13px * var(--text-scale, 1)); color: var(--text-muted); }
+.stats__foot, .stats__loading, .stats__error { font-size: calc(14px * var(--text-scale, 1)); color: var(--text-muted); }
 .stats__error { color: var(--text); }
 
 /* Loading placeholders */
@@ -73,9 +73,9 @@
   animation: stats-rise 0.6s ease-out both;
   animation-delay: 600ms;
 }
-.stats__panel h2 { margin: 0 0 var(--space-3); font-size: 17px; color: var(--brand); }
+.stats__panel h2 { margin: 0 0 var(--space-3); font-size: calc(17px * var(--text-scale, 1)); color: var(--brand); }
 .bar { margin-block-end: var(--space-3); }
-.bar__head { display: flex; justify-content: space-between; gap: var(--space-3); font-size: 14px; margin-block-end: 4px; }
+.bar__head { display: flex; justify-content: space-between; gap: var(--space-3); font-size: calc(14px * var(--text-scale, 1)); margin-block-end: 4px; }
 .bar__track { height: 12px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
 .bar__fill {
   height: 100%;

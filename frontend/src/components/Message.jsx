@@ -68,7 +68,7 @@ export default function Message({ message }) {
                 {copied ? <CheckIcon /> : <CopyIcon />}
                 <span aria-live="polite">{copied ? "הועתק" : "העתקה"}</span>
               </button>
-              <SpeakButton text={message.content} containerRef={textRef} autoPlay={settings.autoRead && animated.current && message.found} />
+              <SpeakButton text={message.content} containerRef={textRef} autoPlay={settings.autoRead && (animated.current || message.live === true) && message.found} />
             </div>
           </div>
         )}

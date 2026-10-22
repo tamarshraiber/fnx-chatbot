@@ -16,7 +16,9 @@ function loadSaved() {
 
 function save(messages) {
   try {
-    if (messages.length) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    // `live` (an answer that just arrived) is not saved: after a refresh nothing should start talking.
+    const toSave = messages.map(({ live, ...rest }) => rest);
+    if (messages.length) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
     else sessionStorage.removeItem(STORAGE_KEY);
   } catch {
     // storage blocked or full: the chat still works, it just will not survive a refresh
@@ -70,6 +72,7 @@ export function useChat() {
           sourceUrl: result.source_url,
           sourceTitle: result.source_title,
           found: result.found,
+          live: true, // arrived just now, even if all at once (a cached answer): auto-read may read it
         },
       ]);
     } catch (e) {
